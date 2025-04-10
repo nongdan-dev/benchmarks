@@ -1,0 +1,20 @@
+# Node.js (chỉ trong test_node)
+test_node/node_modules/
+test_node/dist/
+test_node/.env
+
+# Rust (chỉ trong test_rust)
+test_rust/target/
+test_rust/Cargo.lock
+
+# Logs và kết quả benchmark
+logs_node/
+logs_rust/
+csv_results/
+
+# VS Code settings
+.vscode/
+
+# Hệ thống
+.DS_Store
+*.log
