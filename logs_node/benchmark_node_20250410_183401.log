@@ -1,0 +1,22 @@
+
+💡 Running Node API benchmark...
+🔍 Benchmarking GET http://localhost:8080/
+⏱️ Rust API response time: 45.861ms
+📨 Response: <html>
+<a href='http://www.enterprisedb.com'><img src='images/edblogo.png' border=0></a></br></br>
+Server is up and running.</br>
+</html>
+
+
+
+📡 Running Node WebSocket benchmark...
+🚀 Connected to ws://127.0.0.1:9001/ws
+✅ 1000 messages echoed in 494.54 ms
+
+🛠️ Running Node CLI benchmark...
+⏱️ Node CLI benchmark starting...
+✅ Node CLI benchmark done in 0.51s
+
+✅ Node Benchmark completed in 10s!
+📝 Log saved to /mnt/d/Demo/Rust/benchs/scripts/../logs_node/benchmark_node_20250410_183401.log
+📊 CSV data saved to /mnt/d/Demo/Rust/benchs/scripts/../csv_results/benchmark_node_20250410_183401.csv

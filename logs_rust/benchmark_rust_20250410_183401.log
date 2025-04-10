@@ -1,0 +1,16 @@
+
+📦 Building Rust project...
+
+🚀 Running Rust API benchmark...
+
+🔌 Running Rust WebSocket benchmark (via Node client)...
+🚀 Connected to ws://127.0.0.1:9001/ws
+✅ 1000 messages echoed in 432.73 ms
+
+🛠️ Running Rust CLI benchmark...
+⏱️ Rust CLI benchmark starting...
+✅ Rust CLI benchmark done in 500.34ms
+
+✅ Rust Benchmark completed in 17s!
+📝 Log saved to /mnt/d/Demo/Rust/benchs/scripts/../logs_rust/benchmark_rust_20250410_183401.log
+📊 CSV data saved to /mnt/d/Demo/Rust/benchs/scripts/../csv_results/benchmark_rust_20250410_183401.csv
