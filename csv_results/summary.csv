@@ -1,8 +1,0 @@
-step,average,min,max,count
-node_api,3.000,3.000,3.000,4
-node_cli,3.667,3.000,4.000,3
-node_websocket,3.250,3.000,4.000,4
-rust_api,1.000,1.000,1.000,3
-rust_cli,4.667,4.000,5.000,3
-rust_websocket,5.000,5.000,5.000,3
-total,14.143,7.000,21.000,7

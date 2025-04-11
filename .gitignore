@@ -11,6 +11,7 @@ test_rust/Cargo.lock
 logs_node/
 logs_rust/
 csv_results/
+plots/
 
 # VS Code settings
 .vscode/

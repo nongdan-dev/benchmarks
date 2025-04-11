@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Benchmark Summary Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: sans-serif; margin: 40px; background-color: black; color: white; }
+    canvas {
+      min-width: 900px;
+      max-width: 1000px;
+      display: block;
+      margin: 0 auto;
+    }
+    h2 {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h2>📈 Benchmark High Performance (Rust vs Node)</h2>
+  <canvas id="comboChart"></canvas>
+
+  <script>
+    async function fetchData() {
+      const response = await fetch('../csv_results/benchmark_high_performance.csv');
+      const data = await response.text();
+      const rows = data.trim().split('\n').slice(1); // skip header
+
+      const timestamps = [];
+      const p50Data = [];
+      const p90Data = [];
+      const p99Data = [];
+      const rateData = [];
+
+      for (const row of rows) {
+        const [timestamp, tool, p50, p90, p99, rate] = row.split(',');
+        timestamps.push(`${timestamp} (${tool})`);
+        p50Data.push(+p50);
+        p90Data.push(+p90);
+        p99Data.push(+p99);
+        rateData.push(+rate);
+      }
+
+      const ctx = document.getElementById('comboChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar', // base type
+        data: {
+          labels: timestamps,
+          datasets: [
+            {
+              label: 'p50 (µs)',
+              data: p50Data,
+              backgroundColor: 'rgba(0, 200, 83, 0.6)',
+              yAxisID: 'latency',
+            },
+            {
+              label: 'p90 (µs)',
+              data: p90Data,
+              backgroundColor: 'rgba(255, 214, 0, 0.6)',
+              yAxisID: 'latency',
+            },
+            {
+              label: 'p99 (µs)',
+              data: p99Data,
+              backgroundColor: 'rgba(33, 150, 243, 0.6)',
+              yAxisID: 'latency',
+            },
+            {
+              label: 'Rate (req/s)',
+              type: 'line',
+              data: rateData,
+              borderColor: 'orange',
+              backgroundColor: 'rgba(255, 165, 0, 0.2)',
+              tension: 0.3,
+              borderWidth: 2,
+              pointRadius: 3,
+              yAxisID: 'rate',
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          scales: {
+            latency: {
+              type: 'linear',
+              position: 'left',
+              title: {
+                display: true,
+                text: 'Latency (µs)',
+                color: 'white'
+              },
+              ticks: { color: 'white' }
+            },
+            rate: {
+              type: 'linear',
+              position: 'right',
+              title: {
+                display: true,
+                text: 'Rate (req/s)',
+                color: 'white'
+              },
+              grid: {
+                drawOnChartArea: false
+              },
+              ticks: { color: 'white' }
+            },
+            x: {
+              ticks: { color: 'white' }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                color: 'white'
+              }
+            },
+            title: {
+              display: true,
+              text: 'Rust vs Node - Latency & Throughput',
+              color: 'white'
+            }
+          }
+        }
+      });
+    }
+
+    fetchData();
+  </script>
+</body>
+</html>
