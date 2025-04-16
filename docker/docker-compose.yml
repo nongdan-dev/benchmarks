@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  node:
+    build:
+      context: ../node
+      dockerfile: ../docker/node.Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - benchmark_net
+
+  rust:
+    build:
+      context: ../rust
+      dockerfile: ../docker/rust.Dockerfile
+    ports:
+      - "3001:3001"
+    networks:
+      - benchmark_net
+
+  wrk:
+    build:
+      context: ..
+      dockerfile: docker/wrk.Dockerfile
+    depends_on:
+      - node
+      - rust
+    networks:
+      - benchmark_net
+    entrypoint: ["sleep", "infinity"]
+    volumes:
+      - ../scripts:/scripts   # Mount thư mục scripts ở ngoài máy host vào trong container tại /scripts
+
+networks:
+  benchmark_net:
+    driver: bridge

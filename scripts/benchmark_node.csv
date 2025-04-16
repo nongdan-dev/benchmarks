@@ -1,0 +1,11 @@
+Metric,Value
+Duration (s),32.352513
+Requests,131821
+Requests/sec,4074.5211971633
+Transfer/sec (bytes),1002332.2145022
+Latency P50 (ms),0.05
+Latency P90 (ms),0.09
+Latency P99 (ms),0.099
+Latency P99.99 (ms),0.09999
+Latency Max (ms),1477.447
+tm99.9 (%),0.0067616638701761
