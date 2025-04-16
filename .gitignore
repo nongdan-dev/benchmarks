@@ -8,7 +8,8 @@ rust/target/
 rust/Cargo.lock
 
 # Logs và kết quả benchmark
-# logs_node/
+scripts/benchmark_node.csv
+scripts/benchmark_rust.csv
 # logs_rust/
 # csv_results/
 # plots/
