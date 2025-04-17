@@ -22,7 +22,8 @@ TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 # 🟦 Benchmark Node.js
 echo ""
 echo "📊 Benchmark Node.js..."
-docker-compose -f docker/docker-compose.yml exec wrk \wrk -t$THREADS -c$CONNECTIONS -d$DURATION --latency -s /scripts/stats.lua http://node:3000
+docker-compose -f docker/docker-compose.yml exec wrk \wrk -t$THREADS -c$CONNECTIONS -d$DURATION --latency -s /scripts/graphql_benchmark.lua http://node:3000/graphql
+#  docker-compose -f docker/docker-compose.yml exec wrk \wrk -t4 -c200 -d30s --latency -s /scripts/graphql_benchmark.lua http://node:3000/graphql
 
 if [ -f scripts/benchmark.csv ]; then
   mv scripts/benchmark.csv "scripts/benchmark_node.csv"
@@ -34,7 +35,7 @@ fi
 # 🟧 Benchmark Rust
 echo ""
 echo "📊 Benchmark Rust..."
-docker-compose -f docker/docker-compose.yml exec wrk \wrk -t$THREADS -c$CONNECTIONS -d$DURATION --latency -s /scripts/stats.lua http://rust:3001
+docker-compose -f docker/docker-compose.yml exec wrk \wrk -t$THREADS -c$CONNECTIONS -d$DURATION --latency -s /scripts/graphql_benchmark.lua http://rust:3001/graphql
 
 if [ -f scripts/benchmark.csv ]; then
   mv scripts/benchmark.csv "scripts/benchmark_rust.csv"

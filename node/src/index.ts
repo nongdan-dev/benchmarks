@@ -1,11 +1,26 @@
-import express from 'express';
+// src/index.ts
+import { ApolloServer } from 'apollo-server';
+import { sequelize } from './db';
+import { userResolvers } from './resolvers/user.resolver';
+import { userTypeDefs } from './schema/user.schema';
 
-const app = express();
-
-app.get('/', (_req, res) => {
-  res.send('Hello from Node.js');
+// Khởi tạo ApolloServer
+const server = new ApolloServer({
+  typeDefs: userTypeDefs,
+  resolvers: userResolvers,
 });
 
-app.listen(3000, '0.0.0.0', () => {
-  console.log('✅ Server running on http://0.0.0.0:3000');
-});
+// Kết nối tới DB và start server
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Database connected successfully!');
+    server
+      .listen(3000)
+      .then(({ url }) => {
+        console.log(`Server is running at ${url}`);
+      });
+  })
+  .catch((error) => {
+    console.error('Unable to connect to the database:', error);
+  });

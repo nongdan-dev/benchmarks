@@ -9,6 +9,12 @@ services:
       - "3000:3000"
     networks:
       - benchmark_net
+    env_file:
+      - ../node/.env
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_URL=postgres://postgres:100845@postgres:5432/demoRustdb
 
   rust:
     build:
@@ -16,6 +22,21 @@ services:
       dockerfile: ../docker/rust.Dockerfile
     ports:
       - "3001:3001"
+    environment:
+      - DATABASE_URL=postgres://postgres:100845@postgres:5432/demoRustdb
+    networks:
+      - benchmark_net
+
+
+  postgres:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 100845
+      POSTGRES_DB: demoRustdb
+    ports:
+      - "5432:5432"
     networks:
       - benchmark_net
 
