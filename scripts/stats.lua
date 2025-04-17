@@ -1,41 +1,23 @@
--- Lua script để phân tích benchmark và ghi ra CSV
+-- scripts/stats.lua
 
-function done(summary, latency, requests)
-  -- Thông tin latency
-  local p50 = latency["50"] / 1000
-  local p90 = latency["90"] / 1000
-  local p99 = latency["99"] / 1000
-  local p9999 = latency["99.99"] / 1000
-  local max = latency["max"] / 1000
-  local tm999 = (latency["99.9"] / latency["max"]) * 100
-  local req_per_sec = summary.requests / (summary.duration / 1000000)
-  local duration_sec = summary.duration / 1000000
-  local transfer_per_sec = summary.bytes / duration_sec
-
-  print("Latency P50: " .. p50 .. " ms")
-  print("Latency P90: " .. p90 .. " ms")
-  print("Latency P99: " .. p99 .. " ms")
-  print("Latency P99.99: " .. p9999 .. " ms")
-  print("Max latency: " .. max .. " ms")
-  print("tm99.9: " .. tm999 .. "%")
-  print("Requests per second: " .. req_per_sec)
-
-  -- Ghi ra CSV với tên mặc định
+done = function(summary, latency, requests)
   local file = io.open("/scripts/benchmark.csv", "w+")
+
   file:write("Metric,Value\n")
-  file:write("Duration (s)," .. duration_sec .. "\n")
+  file:write("Duration (s)," .. string.format("%.2f", summary.duration / 1000000) .. "\n")
   file:write("Requests," .. summary.requests .. "\n")
-  file:write("Requests/sec," .. req_per_sec .. "\n")
-  file:write("Transfer/sec (bytes)," .. transfer_per_sec .. "\n")
-  file:write("Latency P50 (ms)," .. p50 .. "\n")
-  file:write("Latency P90 (ms)," .. p90 .. "\n")
-  file:write("Latency P99 (ms)," .. p99 .. "\n")
-  file:write("Latency P99.99 (ms)," .. p9999 .. "\n")
-  file:write("Latency Max (ms)," .. max .. "\n")
-  file:write("tm99.9 (%)," .. tm999 .. "\n")
+  file:write("Requests/sec," .. string.format("%.2f", summary.requests / (summary.duration / 1000000)) .. "\n")
+  file:write("Transfer/sec (bytes)," .. string.format("%.2f", summary.bytes / (summary.duration / 1000000)) .. "\n")
+
+  file:write("Latency P50 (ms)," .. string.format("%.2f", latency:percentile(50.0)) .. "\n")
+  file:write("Latency P90 (ms)," .. string.format("%.2f", latency:percentile(90.0)) .. "\n")
+  file:write("Latency P99 (ms)," .. string.format("%.2f", latency:percentile(99.0)) .. "\n")
+  file:write("Latency P99.99 (ms)," .. string.format("%.2f", latency:percentile(99.99)) .. "\n")
+  file:write("Latency Max (ms)," .. string.format("%.2f", latency.max) .. "\n")
+
+  -- ✅ Không lặp qua latency nữa
+  -- Nếu cần, hãy tính tm99.9 từ P99.9 như một đại diện gần đúng:
+  file:write("tm99.9 (approx ms)," .. string.format("%.2f", latency:percentile(99.9)) .. "\n")
+
   file:close()
-
-  print("📄 Đã ghi kết quả vào /scripts/benchmark.csv")
 end
-
-return {}
