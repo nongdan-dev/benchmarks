@@ -1,11 +1,12 @@
 Metric,Value
-Duration (s),32.98
-Requests,213291
-Requests/sec,6467.91
-Transfer/sec (bytes),575644.32
-Latency P50 (ms),25546.00
-Latency P90 (ms),62235.00
-Latency P99 (ms),1528546.00
-Latency P99.99 (ms),1871402.00
-Latency Max (ms),1873223.00
-tm99.9 (approx ms),1840285.00
+Duration (s),32.75
+Requests,180417
+Requests/sec,5508.23
+Transfer/sec (bytes),980464.82
+Transfer/sec (MB),0.94
+Latency P50 (ms),31775.00
+Latency P90 (ms),38372.00
+Latency P99 (ms),60441.00
+Latency P99.99 (ms),122653.00
+Latency Max (ms),126645.00
+tm99.9 (approx ms),101943.00

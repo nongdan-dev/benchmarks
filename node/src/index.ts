@@ -4,19 +4,19 @@ import { sequelize } from './db';
 import { userResolvers } from './resolvers/user.resolver';
 import { userTypeDefs } from './schema/user.schema';
 
-// Khởi tạo ApolloServer
 const server = new ApolloServer({
   typeDefs: userTypeDefs,
   resolvers: userResolvers,
 });
 
-// Kết nối tới DB và start server
 sequelize
   .authenticate()
-  .then(() => {
-    console.log('Database connected successfully!');
-    server
-      .listen(3000)
+  .then(async () => {
+    sequelize.sync({ alter: true })
+      .then(() => {
+        console.log('All models were synchronized successfully.');
+        return server.listen(3000);
+      })
       .then(({ url }) => {
         console.log(`Server is running at ${url}`);
       });

@@ -1,8 +1,10 @@
 use sea_orm::{EntityTrait, Set, ColumnTrait, QueryFilter, ActiveModelTrait};
 use sea_orm::DatabaseConnection;
-use crate::models::user::{Entity as UserEntity, ActiveModel as UserActiveModel, UserGraphQL};
+// use crate::models::user::{Entity as UserEntity, ActiveModel as UserActiveModel, UserGraphQL};
+use crate::models::user::{self, Entity as UserEntity, ActiveModel as UserActiveModel, UserGraphQL};
 use async_graphql::{Context, Object, Result};
-// use sea_orm::ActiveModelTrait;
+use chrono::Utc;
+// use crate::models::user::{Column};
 
 
 #[derive(Default)]
@@ -10,7 +12,7 @@ pub struct QueryRoot;
 
 #[Object]
 impl QueryRoot {
-    async fn get_users(&self, ctx: &Context<'_>) -> Result<Vec<UserGraphQL>> {
+    async fn users(&self, ctx: &Context<'_>) -> Result<Vec<UserGraphQL>> {
         let db = ctx.data::<DatabaseConnection>()?;
         let users = UserEntity::find()
             .all(db)
@@ -39,15 +41,28 @@ pub struct MutationRoot;
 
 #[Object]
 impl MutationRoot {
-    async fn create_user(&self, ctx: &Context<'_>, name: String, email: String) -> Result<UserGraphQL> {
+    async fn create_user(&self, ctx: &Context<'_>, name: String, email: String, password: String) -> Result<UserGraphQL> {
         let db = ctx.data::<DatabaseConnection>()?;
+
+        // Kiểm tra email đã tồn tại chưa
+        let existing = UserEntity::find()
+        .filter(user::Column::Email.eq(email.clone()))
+        .one(db)
+        .await?;
+
+        if existing.is_some() {
+            return Err("Email already exists".into());
+        }
+
         let new_user = UserActiveModel {
             name: Set(name),
             email: Set(email),
+            password: Set(password),
+            created_at: Set(Some(Utc::now())),
             ..Default::default()
         };
 
-        let user = new_user.insert(db).await.map_err(|_| "Insert error")?;
+        let user = new_user.insert(db).await?;
         Ok(UserGraphQL::from(user))
     }
 

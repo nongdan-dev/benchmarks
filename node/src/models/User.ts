@@ -35,4 +35,5 @@ export const User = sequelize.define<Model<UserAttributes, UserCreationAttribute
   timestamps: true,
   updatedAt: false,
   createdAt: 'createdAt',
+  freezeTableName: true
 });

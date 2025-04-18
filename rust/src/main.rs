@@ -7,8 +7,18 @@ use async_graphql::{Schema, EmptySubscription};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 use sea_orm::DatabaseConnection;
 
-use handlers::{QueryRoot, MutationRoot}; // Import từ `handlers/mod.rs`
+use handlers::{QueryRoot, MutationRoot};
 use db::establish_connection;
+
+use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
+use actix_web::{HttpResponse, Responder};
+
+
+async fn graphql_playground() -> impl Responder {
+    HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
+}
 
 /// Xử lý GraphQL requests
 async fn graphql_handler(
@@ -21,15 +31,10 @@ async fn graphql_handler(
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    dotenvy::dotenv().ok(); // Load biến môi trường từ .env
-
-    // Lấy PORT, fallback về 3001 nếu không đặt
+    dotenvy::dotenv().ok();
     let port = std::env::var("PORT").unwrap_or_else(|_| "3001".to_string());
-
-    // Kết nối database
     let pool: DatabaseConnection = establish_connection().await;
 
-    // Tạo GraphQL schema
     let schema = Schema::build(QueryRoot, MutationRoot, EmptySubscription)
         .data(pool.clone())
         .finish();
@@ -42,8 +47,9 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(pool.clone()))
             .app_data(web::Data::new(schema.clone()))
             .route("/graphql", web::post().to(graphql_handler))
+            .route("/graphql", web::get().to(graphql_playground))
     })
-    .bind(format!("127.0.0.1:{}", port))?
+    .bind(format!("0.0.0.0:{}", port))?
     .run()
     .await
 }

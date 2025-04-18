@@ -1,6 +1,8 @@
 use sea_orm::entity::prelude::*;
 use serde::{Serialize, Deserialize};
 use async_graphql::SimpleObject;
+// use chrono::Utc;
+use chrono::{DateTime, Utc};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize)]
 #[sea_orm(table_name = "user")]
@@ -11,6 +13,8 @@ pub struct Model {
     pub password: String,
     #[sea_orm(unique)]
     pub email: String,
+    #[sea_orm(column_name = "createdAt")]
+    pub created_at: Option<DateTime<Utc>>
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
@@ -23,6 +27,7 @@ pub struct UserGraphQL {
     pub id: String,
     pub name: String,
     pub email: String,
+    pub password: String,
 }
 
 impl From<Model> for UserGraphQL {
@@ -31,6 +36,7 @@ impl From<Model> for UserGraphQL {
             id: model.id.to_string(),
             name: model.name,
             email: model.email,
+            password: model.password,
         }
     }
 }
