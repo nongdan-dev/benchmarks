@@ -31,7 +31,10 @@ async fn graphql_handler(
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    tracing_subscriber::fmt::init();
+
     dotenvy::dotenv().ok();
+    
     let port = std::env::var("PORT").unwrap_or_else(|_| "3001".to_string());
     let pool: DatabaseConnection = establish_connection().await;
 
