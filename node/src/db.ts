@@ -5,7 +5,7 @@ import { Sequelize } from 'sequelize';
 //   logging: false,
 // });
 export const sequelize = new Sequelize({
-  host: 'localhost',
+  host: 'postgres',
   port: 5432,
   username: 'postgres',
   password: '100845',

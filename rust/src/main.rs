@@ -1,7 +1,10 @@
+// src/main.rs
 mod db;
 mod models;
 mod handlers;
+mod rest;
 
+use rest::user::{get_users, create_user, get_user_by_id};
 use actix_web::{App, HttpServer, web};
 use async_graphql::{Schema, EmptySubscription};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
@@ -51,6 +54,9 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(schema.clone()))
             .route("/graphql", web::post().to(graphql_handler))
             .route("/graphql", web::get().to(graphql_playground))
+            .service(get_users)
+            .service(get_user_by_id)
+            .service(create_user)
     })
     .bind(format!("0.0.0.0:{}", port))?
     .run()

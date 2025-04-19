@@ -1,7 +1,7 @@
+// src/models/user.rs
 use sea_orm::entity::prelude::*;
 use serde::{Serialize, Deserialize};
 use async_graphql::SimpleObject;
-// use chrono::Utc;
 use chrono::{DateTime, Utc};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize)]
