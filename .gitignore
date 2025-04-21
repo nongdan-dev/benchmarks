@@ -9,8 +9,11 @@ rust/Cargo.lock
 rust/.env
 
 # Logs và kết quả benchmark
-scripts/benchmark_node.csv
-scripts/benchmark_rust.csv
+scripts/benchmark_node_graphql.csv
+scripts/benchmark_rust_graphql.csv
+
+scripts/benchmark_node_restful.csv
+scripts/benchmark_rust_restful.csv
 # logs_rust/
 # csv_results/
 # plots/

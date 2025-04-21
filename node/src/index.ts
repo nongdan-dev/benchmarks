@@ -1,62 +1,72 @@
 // src/index.ts
 import express, { Request, Response } from 'ultimate-express';
 import { ApolloServer } from '@apollo/server';
-import { startStandaloneServer } from '@apollo/server/standalone';
+import { expressMiddleware } from '@apollo/server/express4';
 import { sequelize } from './db';
 import { userResolvers } from './resolvers/user.resolver';
 import { userTypeDefs } from './schema/user.schema';
 import { User } from './models/User';
 
-const PORT = 4000
-const startServer = async () => {
+import cluster from 'node:cluster';
+import os from 'node:os';
+
+const PORT = 3000;
+const numCPUs = os.availableParallelism();
+
+const createServer = async () => {
   const app = express();
-
   app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
-
 
   const server = new ApolloServer({
     typeDefs: userTypeDefs,
     resolvers: userResolvers,
   });
 
-  await sequelize.authenticate();
-  await sequelize.sync({ alter: true });
-  const { url } = await startStandaloneServer(server, {
-    listen: {
-      port: PORT
-    }
-  });
-  console.log(`🚀 Server Graphql is running at ${url}`);
+  await server.start();
+  app.use('/graphql', expressMiddleware(server));
 
-  app.get('/user', async (req: Request,res: Response) =>{
-    const users = await User.findAll().then( arr => arr.map(e => e.toJSON()))
-    return res.status(200).json({
-      status: true,
-      users
-    })
+  app.get('/users', async (_req: Request, res: Response) => {
+    const users = await User.findAll().then(arr => arr.map(e => e.toJSON()));
+    return res.status(200).json({ status: true, users });
   });
 
-  app.post('/create', async (req, res) =>{
-    const { name, email, password } = req.body
-
+  app.post('/create', async (req: Request, res: Response) => {
+    const { name, email, password } = req.body;
     if (!name || !email || !password) {
-      throw new Error('Missing params')
+      return res.status(400).json({ status: false, message: 'Missing params' });
     }
+    const user = await User.create({ name, email, password }).then(v => v.toJSON());
+    return res.status(200).json({ status: true, user });
+  });
 
-    const user = await User.create({...req.body}).then( v => v.toJSON())
-    return res.status(200).json({
-      status: true,
-      user
-    })
-  })
-
-
-  app.listen(4001, () => {
-    console.log(`Server Restful is running on port: 4001`);
-});
+  app.listen(PORT, () => {
+    console.log(`Worker ${process.pid} running on http://localhost:${PORT}`);
+    console.log(`GraphQL: http://localhost:${PORT}/graphql`);
+  });
 };
 
-startServer().catch((error) => {
-  console.error('Error starting server:', error);
+const startCluster = async () => {
+  if (cluster.isPrimary) {
+    console.log(`Primary ${process.pid} is running`);
+
+    await sequelize.authenticate();
+    await sequelize.sync({ alter: true });
+
+    for (let i = 0; i < numCPUs; i++) {
+      cluster.fork();
+    }
+
+    cluster.on('exit', worker => {
+      console.log(`Worker ${worker.process.pid} died. Forking a new one...`);
+      cluster.fork();
+    });
+  } else {
+    createServer().catch(err => {
+      console.error(`Error in worker ${process.pid}`, err);
+    });
+  }
+};
+
+startCluster().catch(err => {
+  console.error('Failed to start cluster:', err);
 });

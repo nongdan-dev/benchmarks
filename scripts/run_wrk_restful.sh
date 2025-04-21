@@ -22,11 +22,11 @@ TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 #Benchmark Node.js
 echo ""
 echo "Benchmark Node.js..."
-docker-compose -f docker/docker-compose.yml exec wrk \wrk -t$THREADS -c$CONNECTIONS -d$DURATION --latency -s /scripts/graphql_benchmark.lua http://node:3000/graphql
-#  docker-compose -f docker/docker-compose.yml exec wrk \wrk -t4 -c200 -d30s --latency -s /scripts/graphql_benchmark.lua http://node:3000/graphql
+docker-compose -f docker/docker-compose.yml exec wrk \wrk -t$THREADS -c$CONNECTIONS -d$DURATION --latency -s /scripts/stats.lua http://node:3000/users
+#  docker-compose -f docker/docker-compose.yml exec wrk \wrk -t4 -c200 -d30s --latency -s /scripts/stats.lua http://node:3000/users
 
 if [ -f scripts/benchmark.csv ]; then
-  mv scripts/benchmark.csv "scripts/benchmark_node.csv"
+  mv scripts/benchmark.csv "scripts/benchmark_node_restful.csv"
   # mv scripts/benchmark.csv "scripts/benchmark_node_${TIMESTAMP}.csv"
 else
   echo "⚠ Không tìm thấy dữ liệu Node.js!"
@@ -35,11 +35,11 @@ fi
 #Benchmark Rust
 echo ""
 echo "Benchmark Rust..."
-docker-compose -f docker/docker-compose.yml exec wrk \wrk -t$THREADS -c$CONNECTIONS -d$DURATION --latency -s /scripts/graphql_benchmark.lua http://rust:3001/graphql
-# docker-compose -f docker/docker-compose.yml exec wrk \wrk -t4 -c200 -d30s --latency -s /scripts/graphql_benchmark.lua http://rust:3001/graphql
+docker-compose -f docker/docker-compose.yml exec wrk \wrk -t$THREADS -c$CONNECTIONS -d$DURATION --latency -s /scripts/stats.lua http://rust:3001/users
+# docker-compose -f docker/docker-compose.yml exec wrk \wrk -t4 -c200 -d30s --latency -s /scripts/stats.lua http://rust:3001/users
 
 if [ -f scripts/benchmark.csv ]; then
-  mv scripts/benchmark.csv "scripts/benchmark_rust.csv"
+  mv scripts/benchmark.csv "scripts/benchmark_rust_restful.csv"
   # mv scripts/benchmark.csv "scripts/benchmark_rust_${TIMESTAMP}.csv"
 else
   echo "⚠ Không tìm thấy dữ liệu Rust!"
