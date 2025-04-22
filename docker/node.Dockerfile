@@ -2,12 +2,8 @@ FROM node:18
 
 WORKDIR /app
 
-# COPY package*.json ./
-COPY package.json package-lock.json ./
-RUN npm install
+COPY ./docker/node-entrypoint.sh /docker-entrypoint.sh
+RUN chmod 755 /docker-entrypoint.sh
 
-COPY . .
-
-EXPOSE 3000
-
-CMD ["npx", "ts-node", "src/index.ts"]
+CMD ["/bin/sh"]
+ENTRYPOINT ["/docker-entrypoint.sh"]

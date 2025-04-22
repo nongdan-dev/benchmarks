@@ -1,7 +1,7 @@
 -- scripts/stats.lua
 
 done = function(summary, latency, requests)
-  local file = io.open("/scripts/benchmark.csv", "w+")
+  local file = io.open("/app/scripts/benchmark.csv", "w+")
 
   file:write("Metric,Value\n")
   file:write("Duration (s)," .. string.format("%.2f", summary.duration / 1000000) .. "\n")

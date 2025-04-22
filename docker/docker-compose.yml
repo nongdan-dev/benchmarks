@@ -1,62 +1,65 @@
 services:
-  node:
-    build:
-      context: ../node
-      dockerfile: ../docker/node.Dockerfile
-    ports:
-      - "3000:3000"
+
+  postgres:
+    container_name: postgres
+    image: postgres:16
+    restart: always
     networks:
-      - benchmark_net
-    # env_file:
-    #   - ../node/.env
+      - MY_NETWORK
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: MY_DB_PASSSWORD
+      POSTGRES_DB: MY_DB_DATABASE
+
+  node:
+    container_name: node
     depends_on:
       - postgres
+    build:
+      context: ..
+      dockerfile: ./docker/node.Dockerfile
+    volumes:
+      - ..:/app
+    networks:
+      - MY_NETWORK
+    ports:
+      - "3000:3000"
     environment:
-      PSQL_HOST: postgres
-      POSTGRES_PASSWORD: 100845
       POSTGRES_USER: postgres
-      POSTGRES_DB: demoRustdb
+      POSTGRES_PASSWORD: MY_DB_PASSSWORD
+      POSTGRES_DB: MY_DB_DATABASE
 
   rust:
+    container_name: rust
+    depends_on:
+      - postgres
     build:
-      context: ../rust
-      dockerfile: ../docker/rust.Dockerfile
+      context: ..
+      dockerfile: ./docker/rust.Dockerfile
+    volumes:
+      - ..:/app
+    networks:
+      - MY_NETWORK
     ports:
       - "3001:3001"
     environment:
-      PSQL_HOST: postgres
-      POSTGRES_PASSWORD: 100845
       POSTGRES_USER: postgres
-      POSTGRES_DB: demoRustdb
-      RUST_LOG: sea_orm=debug,sqlx=info,rust=debug
-    networks:
-      - benchmark_net
-
-  postgres:
-    image: postgres:16
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 100845
-      POSTGRES_DB: demoRustdb
-    ports:
-      - "5432:5432"
-    networks:
-      - benchmark_net
+      POSTGRES_PASSWORD: MY_DB_PASSSWORD
+      POSTGRES_DB: MY_DB_DATABASE
 
   wrk:
+    container_name: wrk
     build:
       context: ..
       dockerfile: docker/wrk.Dockerfile
-    depends_on:
-      - node
-      - rust
     networks:
-      - benchmark_net
-    entrypoint: ["sleep", "infinity"]
+      - MY_NETWORK
     volumes:
-      - ../scripts:/scripts
+      - ..:/app
+    entrypoint: ["sleep", "infinity"]
 
 networks:
-  benchmark_net:
+  MY_NETWORK:
     driver: bridge

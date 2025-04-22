@@ -1,52 +1,19 @@
 FROM ubuntu:20.04
 
-# Install dependencies
-RUN apt-get update && \
-    apt-get install -y git build-essential libssl-dev unzip curl
+RUN apt-get update
+RUN apt-get install -y git build-essential libssl-dev unzip curl
 
-# Clone and build wrk
+# wrk is not available via apt in Ubuntu 20.04 official repos
+RUN git clone https://github.com/wg/wrk.git /wrk
 WORKDIR /wrk
-RUN git clone https://github.com/wg/wrk.git . && make
+RUN make
+RUN cp ./wrk /usr/local/bin/wrk
+RUN chmod 755 /usr/local/bin/wrk
 
-# Copy compiled binary to a common path
-RUN cp ./wrk /usr/local/bin/wrk && chmod +x /usr/local/bin/wrk
+WORKDIR /app
 
-# Optional: Add Lua script directory if needed
-WORKDIR /scripts
+COPY ./docker/wrk-entrypoint.sh /docker-entrypoint.sh
+RUN chmod 755 /docker-entrypoint.sh
 
-
-
-
-# FROM debian:bullseye
-
-# RUN apt-get update && apt-get install -y \
-#     build-essential \
-#     libssl-dev \
-#     git \
-#     unzip \
-#     curl
-
-# WORKDIR /wrk
-# RUN git clone https://github.com/wg/wrk.git . && make
-
-# # ✅ Thêm dòng này để có thể chạy `wrk` từ bất kỳ đâu
-# RUN cp wrk /usr/local/bin/
-
-# WORKDIR /scripts
-# ENTRYPOINT ["sh"]
-
-
-# FROM debian:bullseye-slim
-
-# RUN apt-get update && \
-#     apt-get install -y --no-install-recommends \
-#     ca-certificates \
-#     unzip \
-#     git build-essential libssl-dev lua5.3 liblua5.3-dev && \
-#     rm -rf /var/lib/apt/lists/*
-
-# WORKDIR /wrk
-
-# RUN git clone https://github.com/wg/wrk.git . && make
-
-# ENTRYPOINT ["./wrk"]
+CMD ["/bin/sh"]
+ENTRYPOINT ["/docker-entrypoint.sh"]

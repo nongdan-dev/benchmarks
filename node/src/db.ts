@@ -1,14 +1,20 @@
 // src/db.ts
 import { Sequelize } from 'sequelize';
 
-// export const sequelize = new Sequelize("postgres://postgres:100845@localhost/demoRustdb", {
-//   logging: false,
-// });
+
+const host = 'postgres' // docker network bridges
+const port = 5432 // default port in docker-compose.yml
+
+// environment variables will be passed directly in docker-compose.yml
+const username = process.env.POSTGRES_USER
+const password = process.env.POSTGRES_PASSWORD
+const database = process.env.POSTGRES_DB
+
 export const sequelize = new Sequelize({
-  host: 'postgres',
-  port: 5432,
-  username: 'postgres',
-  password: '100845',
-  database: 'demoRustdb',
+  host,
+  port,
+  username,
+  password,
+  database,
   dialect: 'postgres',
 });
