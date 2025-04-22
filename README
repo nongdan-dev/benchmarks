@@ -1,0 +1,9 @@
+build docker:
+docker-compose -f docker/docker-compose.yml up --build -d
+
+docker-compose -f docker/docker-compose.yml down
+
+Graphql
+./scripts/run_wrk_graphql.sh
+Restful
+./scripts/run_wrk_restful.sh

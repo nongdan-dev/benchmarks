@@ -25,19 +25,19 @@ const createServer = async () => {
   await server.start();
   app.use('/graphql', expressMiddleware(server));
 
-  app.get('/users', async (_req: Request, res: Response) => {
-    const users = await User.findAll().then(arr => arr.map(e => e.toJSON()));
-    return res.status(200).json({ status: true, users });
-  });
+  // app.get('/users', async (_req: Request, res: Response) => {
+  //   const users = await User.findAll().then(arr => arr.map(e => e.toJSON()));
+  //   return res.status(200).json({ status: true, users });
+  // });
 
-  app.post('/create', async (req: Request, res: Response) => {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
-      return res.status(400).json({ status: false, message: 'Missing params' });
-    }
-    const user = await User.create({ name, email, password }).then(v => v.toJSON());
-    return res.status(200).json({ status: true, user });
-  });
+  // app.post('/create', async (req: Request, res: Response) => {
+  //   const { name, email, password } = req.body;
+  //   if (!name || !email || !password) {
+  //     return res.status(400).json({ status: false, message: 'Missing params' });
+  //   }
+  //   const user = await User.create({ name, email, password }).then(v => v.toJSON());
+  //   return res.status(200).json({ status: true, user });
+  // });
 
   app.listen(PORT, () => {
     console.log(`Worker ${process.pid} running on http://localhost:${PORT}`);

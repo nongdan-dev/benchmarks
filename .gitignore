@@ -8,6 +8,10 @@ rust/target/
 rust/Cargo.lock
 rust/.env
 
+# Golang (chỉ trong go)
+golang/.env
+golang/go.sum
+
 # Logs và kết quả benchmark
 scripts/benchmark_node_graphql.csv
 scripts/benchmark_rust_graphql.csv
