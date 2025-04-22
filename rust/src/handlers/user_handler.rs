@@ -1,10 +1,8 @@
 use sea_orm::{EntityTrait, Set, ColumnTrait, QueryFilter, ActiveModelTrait};
 use sea_orm::DatabaseConnection;
-// use crate::models::user::{Entity as UserEntity, ActiveModel as UserActiveModel, UserGraphQL};
 use crate::models::user::{self, Entity as UserEntity, ActiveModel as UserActiveModel, UserGraphQL};
 use async_graphql::{Context, Object, Result};
 use chrono::Utc;
-// use crate::models::user::{Column};
 
 
 #[derive(Default)]
@@ -24,10 +22,10 @@ impl QueryRoot {
 
     async fn get_user(&self, ctx: &Context<'_>, id: String) -> Result<Option<UserGraphQL>> {
         let db = ctx.data::<DatabaseConnection>()?;
-        let user_id: i32 = id.parse().map_err(|_| "Invalid ID format")?; // Chuyển đổi String thành i32
+        let user_id: i32 = id.parse().map_err(|_| "Invalid ID format")?;
 
         let user = UserEntity::find()
-            .filter(crate::models::user::Column::Id.eq(user_id))  // Sử dụng i32 trong query
+            .filter(crate::models::user::Column::Id.eq(user_id))
             .one(db)
             .await
             .map_err(|_| "Database error")?;
@@ -44,7 +42,6 @@ impl MutationRoot {
     async fn create_user(&self, ctx: &Context<'_>, name: String, email: String, password: String) -> Result<UserGraphQL> {
         let db = ctx.data::<DatabaseConnection>()?;
 
-        // Kiểm tra email đã tồn tại chưa
         let existing = UserEntity::find()
         .filter(user::Column::Email.eq(email.clone()))
         .one(db)
@@ -68,10 +65,10 @@ impl MutationRoot {
 
     async fn update_user(&self, ctx: &Context<'_>, id: String, name: String) -> Result<UserGraphQL> {
         let db = ctx.data::<DatabaseConnection>()?;
-        let user_id: i32 = id.parse().map_err(|_| "Invalid ID format")?; // Chuyển đổi String thành i32
+        let user_id: i32 = id.parse().map_err(|_| "Invalid ID format")?;
 
         let user = UserEntity::find()
-            .filter(crate::models::user::Column::Id.eq(user_id))  // Sử dụng i32 trong query
+            .filter(crate::models::user::Column::Id.eq(user_id))
             .one(db)
             .await
             .map_err(|_| "Database error")?
@@ -86,10 +83,10 @@ impl MutationRoot {
 
     async fn delete_user(&self, ctx: &Context<'_>, id: String) -> Result<bool> {
         let db = ctx.data::<DatabaseConnection>()?;
-        let user_id: i32 = id.parse().map_err(|_| "Invalid ID format")?; // Chuyển đổi String thành i32
+        let user_id: i32 = id.parse().map_err(|_| "Invalid ID format")?;
 
         let result = UserEntity::delete_many()
-            .filter(crate::models::user::Column::Id.eq(user_id))  // Sử dụng i32 trong query
+            .filter(crate::models::user::Column::Id.eq(user_id))
             .exec(db)
             .await
             .map_err(|_| "Delete error")?;

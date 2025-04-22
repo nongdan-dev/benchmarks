@@ -1,9 +1,8 @@
-FROM node:18
+FROM rust:1.86
 
-WORKDIR /app
-
-COPY ./docker/node-entrypoint.sh /docker-entrypoint.sh
+COPY ./rust/docker-entrypoint.sh /
 RUN chmod 755 /docker-entrypoint.sh
 
+WORKDIR /repo/rust
 CMD ["/bin/sh"]
 ENTRYPOINT ["/docker-entrypoint.sh"]

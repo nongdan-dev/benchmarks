@@ -1,4 +1,3 @@
-// src/schema/user.schema.ts
 import { gql } from 'graphql-tag';
 
 export const userTypeDefs = gql`

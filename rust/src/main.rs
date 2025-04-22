@@ -1,4 +1,3 @@
-// src/main.rs
 mod db;
 mod models;
 mod handlers;
@@ -16,14 +15,12 @@ use db::establish_connection;
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use actix_web::{HttpResponse, Responder};
 
-
 async fn graphql_playground() -> impl Responder {
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
 }
 
-/// Xử lý GraphQL requests
 async fn graphql_handler(
     schema: web::Data<Schema<QueryRoot, MutationRoot, EmptySubscription>>,
     req: GraphQLRequest,
@@ -31,14 +28,9 @@ async fn graphql_handler(
     schema.execute(req.into_inner()).await.into()
 }
 
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    tracing_subscriber::fmt::init();
-
-    dotenvy::dotenv().ok();
-    
-    let port = std::env::var("PORT").unwrap_or_else(|_| "3001".to_string());
+    let port = "3001";
     let pool: DatabaseConnection = establish_connection().await;
 
     let schema = Schema::build(QueryRoot, MutationRoot, EmptySubscription)
@@ -47,7 +39,6 @@ async fn main() -> std::io::Result<()> {
 
     println!("🚀 Server running at http://127.0.0.1:{}/graphql", port);
 
-    // Khởi chạy Actix server với PORT từ biến môi trường
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone()))

@@ -1,9 +1,3 @@
-build docker:
-docker-compose -f docker/docker-compose.yml up --build -d
+# http benchmarks for nodejs, golang, rust
 
-docker-compose -f docker/docker-compose.yml down
-
-Graphql
-./scripts/run_wrk_graphql.sh
-Restful
-./scripts/run_wrk_restful.sh
+postgres, restful, graphql

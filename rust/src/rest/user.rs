@@ -1,6 +1,5 @@
 use actix_web::{get, post, web, HttpResponse, Responder};
 use sea_orm::{EntityTrait, Set, ColumnTrait, QueryFilter, DatabaseConnection};
-// use sea_orm::DatabaseConnection;
 use crate::models::user::{Entity as UserEntity, Column as UserColumn, ActiveModel as UserActiveModel };
 use chrono::Utc;
 
@@ -30,12 +29,6 @@ pub async fn get_user_by_id(
     }
 }
 
-
-
-
-
-
-// Định nghĩa kiểu dữ liệu JSON cho request body
 #[derive(serde::Deserialize)]
 pub struct UserCreateRequest {
     pub name: String,
@@ -48,16 +41,14 @@ pub async fn create_user(
     db: web::Data<DatabaseConnection>,
     new_user: web::Json<UserCreateRequest>,
 ) -> impl Responder {
-    // Tạo ActiveModel từ dữ liệu request
     let new_user_model = UserActiveModel {
         name: Set(new_user.name.clone()),
         email: Set(new_user.email.clone()),
         password: Set(new_user.password.clone()),
         created_at: Set(Some(Utc::now())),
-        ..Default::default() // Sử dụng giá trị mặc định cho các trường khác
+        ..Default::default()
     };
 
-    // Lưu user vào database
     match UserEntity::insert(new_user_model)
         .exec(db.get_ref())
         .await

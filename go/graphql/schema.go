@@ -4,8 +4,6 @@ import (
 	"golang/config"
 	"golang/models"
 
-	// "time"
-
 	"github.com/graphql-go/graphql"
 )
 
@@ -20,7 +18,6 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-// Query để lấy danh sách users
 var RootQuery = graphql.NewObject(graphql.ObjectConfig{
 	Name: "RootQuery",
 	Fields: graphql.Fields{
@@ -47,7 +44,6 @@ var RootQuery = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-// Mutation để tạo user
 var RootMutation = graphql.NewObject(graphql.ObjectConfig{
 	Name: "RootMutation",
 	Fields: graphql.Fields{

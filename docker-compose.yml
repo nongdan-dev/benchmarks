@@ -1,0 +1,58 @@
+services:
+
+  benchmarks-node:
+    container_name: benchmarks-node
+    depends_on:
+      - benchmarks-postgres
+    build:
+      context: .
+      dockerfile: ./node/Dockerfile
+    volumes:
+      - .:/repo
+    networks:
+      - benchmarks-network
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+
+  benchmarks-rust:
+    container_name: benchmarks-rust
+    depends_on:
+      - benchmarks-postgres
+    build:
+      context: .
+      dockerfile: ./rust/Dockerfile
+    volumes:
+      - .:/repo
+    networks:
+      - benchmarks-network
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+
+  benchmarks-postgres:
+    container_name: benchmarks-postgres
+    image: postgres:16
+    restart: always
+    networks:
+      - benchmarks-network
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+
+  benchmarks-wrk:
+    container_name: benchmarks-wrk
+    build:
+      context: .
+      dockerfile: ./wrk/Dockerfile
+    networks:
+      - benchmarks-network
+    volumes:
+      - .:/repo
+
+networks:
+  benchmarks-network:
+    driver: bridge

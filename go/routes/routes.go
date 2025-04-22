@@ -19,7 +19,7 @@ func SetupRouter() *mux.Router {
 	graphQLHandler := handler.New(&handler.Config{
 		Schema:   &gql.Schema,
 		Pretty:   true,
-		GraphiQL: true, // Cho phép truy cập http://localhost:4300/graphql để test
+		GraphiQL: true,
 	})
 	router.Handle("/graphql", graphQLHandler).Methods(http.MethodPost, http.MethodGet)
 

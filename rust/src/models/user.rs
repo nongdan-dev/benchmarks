@@ -1,4 +1,3 @@
-// src/models/user.rs
 use sea_orm::entity::prelude::*;
 use serde::{Serialize, Deserialize};
 use async_graphql::SimpleObject;

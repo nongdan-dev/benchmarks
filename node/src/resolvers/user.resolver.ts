@@ -1,5 +1,3 @@
-// src/resolvers/user.resolver.ts
-
 import { User } from "../models/User";
 
 export const userResolvers = {

@@ -1,34 +1,73 @@
 # =============================================================================
 # benchmark
 
+rust_restful:
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/restful.lua http://benchmarks-rust:3001/users;
+
+rust_graphql:
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/graphql.lua http://benchmarks-rust:3001;
+
 node_restful:
-	docker-compose -f docker/docker-compose.yml exec wrk \wrk -t4 -c200 -d30s --latency -s /app/scripts/stats.lua http://node:3000/users
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/restful.lua http://benchmarks-node:3000/users;
 
 node_graphql:
-	docker-compose -f docker/docker-compose.yml exec wrk \wrk -t4 -c200 -d30s --latency -s /app/scripts/graphql_benchmark.lua http://node:3000/graphql
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/graphql.lua http://benchmarks-node:3000;
 
 # =============================================================================
-# run
+# rebuild the docker image and run
+# by default, this will not recompile the code if there is corresponding binary
 
 rnode:
-	make knode \
-	&& docker-compose -f docker/docker-compose.yml up --build node
+	make -Bs knode \
+	&& export RUN=benchmarks-node \
+	&& make -Bs _run;
+
+rrust:
+	make -Bs krust \
+	&& export RUN=benchmarks-rust \
+	&& make -Bs _run;
+
+rbrust:
+	rm -f ./rust/target/release/rust \
+	&& make -Bs rrust;
 
 rwrk:
-	make kwrk \
-	&& docker-compose -f docker/docker-compose.yml up -d --build wrk
+	make -Bs kwrk \
+	&& export RUN=benchmarks-wrk \
+	&& make -Bs _run;
+
+# kill and cleanup, then rebuild the docker image and run all services
+run:
+	make -Bs kill \
+	&& export RUN="benchmarks-node benchmarks-rust benchmarks-wrk" \
+	&& make -Bs _run;
+
+# shortcut to rebuild the docker image and run
+_run:
+	docker-compose build $(RUN) --force-rm \
+	&& docker-compose up $(RUN) -d --remove-orphans;
 
 # =============================================================================
-# kill
+# kill and cleanup
 
 knode:
-	export KILL=node \
+	export KILL=benchmarks-node \
+	&& make -Bs _kill;
+
+krust:
+	export KILL=benchmarks-rust \
 	&& make -Bs _kill;
 
 kwrk:
-	export KILL=wrk \
+	export KILL=benchmarks-wrk \
 	&& make -Bs _kill;
 
+# kill and cleanup all services
+kill:
+	export KILL=benchmarks- \
+	&& make -Bs _kill;
+
+# shortcut to kill and cleanup
 _kill:
 	((docker kill $$(docker ps -q --no-trunc --filter name=^$(KILL)) > /dev/null 2>&1) || true) \
 	&& ((docker rm -f $$(docker ps -a -q --no-trunc --filter name=^$(KILL)) > /dev/null 2>&1) || true) \

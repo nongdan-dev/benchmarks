@@ -1,4 +1,3 @@
-// src/index.ts
 import express, { Request, Response } from 'ultimate-express';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
