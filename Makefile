@@ -1,17 +1,23 @@
 # =============================================================================
 # benchmark
 
-rust_restful:
-	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/restful.lua http://benchmarks-rust:3001/users;
-
-rust_graphql:
-	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/graphql.lua http://benchmarks-rust:3001;
-
 node_restful:
-	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/restful.lua http://benchmarks-node:3000/users;
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/restful.lua http://benchmarks-node:30000/users;
 
 node_graphql:
-	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/graphql.lua http://benchmarks-node:3000;
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/graphql.lua http://benchmarks-node:30000;
+
+go_restful:
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/restful.lua http://benchmarks-go:30000/users;
+
+go_graphql:
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/graphql.lua http://benchmarks-go:30000;
+
+rust_restful:
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/restful.lua http://benchmarks-rust:30000/users;
+
+rust_graphql:
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/graphql.lua http://benchmarks-rust:30000;
 
 # =============================================================================
 # rebuild the docker image and run
@@ -20,6 +26,11 @@ node_graphql:
 rnode:
 	make -Bs knode \
 	&& export RUN=benchmarks-node \
+	&& make -Bs _run;
+
+rgo:
+	make -Bs kgo \
+	&& export RUN=benchmarks-go \
 	&& make -Bs _run;
 
 rrust:
@@ -36,7 +47,7 @@ rwrk:
 	&& export RUN=benchmarks-wrk \
 	&& make -Bs _run;
 
-# kill and cleanup, then rebuild the docker image and run all services
+# kill and cleanup, then rebuild the docker image and run, for all services
 run:
 	make -Bs kill \
 	&& export RUN="benchmarks-node benchmarks-rust benchmarks-wrk" \
@@ -54,6 +65,10 @@ knode:
 	export KILL=benchmarks-node \
 	&& make -Bs _kill;
 
+kgo:
+	export KILL=benchmarks-go \
+	&& make -Bs _kill;
+
 krust:
 	export KILL=benchmarks-rust \
 	&& make -Bs _kill;
@@ -62,7 +77,7 @@ kwrk:
 	export KILL=benchmarks-wrk \
 	&& make -Bs _kill;
 
-# kill and cleanup all services
+# kill and cleanup, for all services
 kill:
 	export KILL=benchmarks- \
 	&& make -Bs _kill;

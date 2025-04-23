@@ -23,7 +23,7 @@ impl ActiveModelBehavior for ActiveModel {}
 
 #[derive(SimpleObject)]
 pub struct UserGraphQL {
-    pub id: String,
+    pub id: i32,
     pub name: String,
     pub email: String,
     pub password: String,
@@ -32,7 +32,7 @@ pub struct UserGraphQL {
 impl From<Model> for UserGraphQL {
     fn from(model: Model) -> Self {
         Self {
-            id: model.id.to_string(),
+            id: model.id,
             name: model.name,
             email: model.email,
             password: model.password,

@@ -12,10 +12,10 @@ services:
     networks:
       - benchmarks-network
     ports:
-      - "3000:3000"
+      - "3000:30000"
     env_file:
       - .env
-    
+
   benchmarks-go:
     container_name: benchmarks-go
     depends_on:
@@ -28,7 +28,7 @@ services:
     networks:
       - benchmarks-network
     ports:
-      - "4300:4300"
+      - "3001:30000"
     env_file:
       - .env
 
@@ -44,7 +44,7 @@ services:
     networks:
       - benchmarks-network
     ports:
-      - "3001:3001"
+      - "3002:30000"
     env_file:
       - .env
 

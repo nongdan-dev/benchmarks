@@ -95,4 +95,8 @@ yarn.lock
 pnpm-lock.yaml
 
 # rust
+**/.rust-cache
 **/target/
+
+# go
+**/.go-cache

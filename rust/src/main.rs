@@ -30,7 +30,7 @@ async fn graphql_handler(
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let port = "3001";
+    let port = "30000";
     let pool: DatabaseConnection = establish_connection().await;
 
     let schema = Schema::build(QueryRoot, MutationRoot, EmptySubscription)

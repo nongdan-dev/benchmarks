@@ -12,10 +12,9 @@ func main() {
 
 	r := routes.SetupRouter()
 
-	log.Println("Server is running GraphQL at http://localhost:4300/graphql")
-	log.Println("Server is running Rest at http://localhost:4300")
+	log.Println("starting on port 30000")
 
-	if err := http.ListenAndServe(":4300", r); err != nil {
+	if err := http.ListenAndServe(":30000", r); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}
 }

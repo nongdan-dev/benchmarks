@@ -9,7 +9,7 @@ import { User } from './models/User';
 import cluster from 'node:cluster';
 import os from 'node:os';
 
-const PORT = 3000;
+const PORT = 30000;
 const numCPUs = os.availableParallelism();
 
 const createServer = async () => {
