@@ -15,6 +15,22 @@ services:
       - "3000:3000"
     env_file:
       - .env
+    
+  benchmarks-go:
+    container_name: benchmarks-go
+    depends_on:
+      - benchmarks-postgres
+    build:
+      context: .
+      dockerfile: ./go/Dockerfile
+    volumes:
+      - .:/repo
+    networks:
+      - benchmarks-network
+    ports:
+      - "4300:4300"
+    env_file:
+      - .env
 
   benchmarks-rust:
     container_name: benchmarks-rust
