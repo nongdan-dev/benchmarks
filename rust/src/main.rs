@@ -37,7 +37,7 @@ async fn main() -> std::io::Result<()> {
         .data(pool.clone())
         .finish();
 
-    println!("🚀 Server running at http://127.0.0.1:{}/graphql", port);
+    println!("Server running at http://127.0.0.1:{}/graphql", port);
 
     HttpServer::new(move || {
         App::new()

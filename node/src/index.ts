@@ -25,17 +25,17 @@ const createServer = async () => {
   app.use('/graphql', expressMiddleware(server));
 
   app.get('/users', async (_req: Request, res: Response) => {
-    const users = await User.findAll().then(arr => arr.map(e => e.toJSON()));
-    return res.status(200).json({ status: true, users });
+    const user = await User.findAll().then(arr => arr.map(e => e.toJSON()));
+    return res.status(200).json(user);
   });
 
   app.post('/create', async (req: Request, res: Response) => {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
-      return res.status(400).json({ status: false, message: 'Missing params' });
+      return res.status(400).json({ message: 'Missing params' });
     }
     const user = await User.create({ name, email, password }).then(v => v.toJSON());
-    return res.status(200).json({ status: true, user });
+    return res.status(200).json(user);
   });
 
   app.listen(PORT, () => {

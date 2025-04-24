@@ -33,7 +33,7 @@ services:
       - .env
 
   benchmarks-rust:
-    container_name: benchmarks-rust
+    container_name: benchmarks-rust 
     depends_on:
       - benchmarks-postgres
     build:

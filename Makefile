@@ -2,22 +2,77 @@
 # benchmark
 
 node_restful:
-	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/restful.lua http://benchmarks-node:30000/users;
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s /repo/wrk/scripts/restful.lua http://benchmarks-node:30000/users;
+	mv ./wrk/output/benchmark.csv ./wrk/output/node_restful.csv;
 
 node_graphql:
-	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/graphql.lua http://benchmarks-node:30000;
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./wrk/scripts/graphql.lua http://benchmarks-node:30000;
+	mv ./wrk/output/benchmark.csv ./wrk/output/node_graphql.csv;
 
 go_restful:
-	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/restful.lua http://benchmarks-go:30000/users;
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./wrk/scripts/restful.lua http://benchmarks-go:30000/users;
+	mv ./wrk/output/benchmark.csv ./wrk/output/go_restful.csv;
 
 go_graphql:
-	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/graphql.lua http://benchmarks-go:30000;
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./wrk/scripts/graphql.lua http://benchmarks-go:30000;
+	mv ./wrk/output/benchmark.csv ./wrk/output/go_graphql.csv;
 
 rust_restful:
-	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/restful.lua http://benchmarks-rust:30000/users;
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./wrk/scripts/restful.lua http://benchmarks-rust:30000/users;
+	mv ./wrk/output/benchmark.csv ./wrk/output/rust_restful.csv;
 
 rust_graphql:
-	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/graphql.lua http://benchmarks-rust:30000;
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./wrk/scripts/graphql.lua http://benchmarks-rust:30000;
+	mv ./wrk/output/benchmark.csv ./wrk/output/rust_graphql.csv;
+
+
+
+
+node_capture_restful:
+	@CONTAINER=$$(docker ps --filter "name=benchmarks-node" --format "{{.Names}}") && \
+	./wrk/scripts/monitor_container.sh restful $$CONTAINER 30 csv & \
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s /repo/wrk/scripts/restful.lua http://benchmarks-node:30000/users && \
+	mv ./wrk/output/benchmark.csv ./wrk/output/node_restful.csv && \
+	cp wrk/output/capture_usage_restful_benchmarks-node.csv ./public/capture_usage_restful_node.csv;
+
+node_capture_graphql:
+	@CONTAINER=$$(docker ps --filter "name=benchmarks-node" --format "{{.Names}}") && \
+	./wrk/scripts/monitor_container.sh graphql $$CONTAINER 30 csv & \
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s /repo/wrk/scripts/graphql.lua http://benchmarks-node:30000 && \
+	mv ./wrk/output/benchmark.csv ./wrk/output/node_graphql.csv
+
+
+
+go_capture_restful:
+	@CONTAINER=$$(docker ps --filter "name=benchmarks-go" --format "{{.Names}}") && \
+	./wrk/scripts/monitor_container.sh restful $$CONTAINER 30 csv & \
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s /repo/wrk/scripts/restful.lua http://benchmarks-go:30000/users && \
+	mv ./wrk/output/benchmark.csv ./wrk/output/go_restful.csv;
+
+
+go_capture_graphql:
+	@CONTAINER=$$(docker ps --filter "name=benchmarks-go" --format "{{.Names}}") && \
+	./wrk/scripts/monitor_container.sh graphql $$CONTAINER 30 csv & \
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s /repo/wrk/scripts/graphql.lua http://benchmarks-go:30000 && \
+	mv ./wrk/output/benchmark.csv ./wrk/output/go_graphql.csv;
+
+
+
+
+rust_capture_restful:
+	@CONTAINER=$$(docker ps --filter "name=benchmarks-rust" --format "{{.Names}}") && \
+	./wrk/scripts/monitor_container.sh restful $$CONTAINER 30 csv & \
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s /repo/wrk/scripts/restful.lua http://benchmarks-rust:30000/users && \
+	mv ./wrk/output/benchmark.csv ./wrk/output/rust_restful.csv;
+
+rust_capture_graphql:
+	@CONTAINER=$$(docker ps --filter "name=benchmarks-rust" --format "{{.Names}}") && \
+	./wrk/scripts/monitor_container.sh graphql $$CONTAINER 30 csv & \
+	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s /repo/wrk/scripts/graphql.lua http://benchmarks-rust:30000 && \
+	mv ./wrk/output/benchmark.csv ./wrk/output/rust_graphql.csv;
+
+
+
 
 # =============================================================================
 # rebuild the docker image and run
@@ -50,7 +105,7 @@ rwrk:
 # kill and cleanup, then rebuild the docker image and run, for all services
 run:
 	make -Bs kill \
-	&& export RUN="benchmarks-node benchmarks-rust benchmarks-wrk" \
+	&& export RUN="benchmarks-node benchmarks-rust benchmarks-wrk benchmarks-go" \
 	&& make -Bs _run;
 
 # shortcut to rebuild the docker image and run
