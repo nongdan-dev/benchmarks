@@ -1,0 +1,71 @@
+{
+  "cpu_min": 0.12,
+  "cpu_max": 659.32,
+  "cpu_avg": 426.83,
+  "ram_min": 1284195221,
+  "ram_max": 1346472247,
+  "ram_avg": 1322069023,
+  "raw": [
+    {
+      "cpu": 535.35,
+      "ram": 1284195221,
+      "ram_humanized": "1.2GB"
+    },
+    {
+      "cpu": 568.33,
+      "ram": 1294932639,
+      "ram_humanized": "1.21GB"
+    },
+    {
+      "cpu": 517.38,
+      "ram": 1301375090,
+      "ram_humanized": "1.21GB"
+    },
+    {
+      "cpu": 603.09,
+      "ram": 1312112508,
+      "ram_humanized": "1.22GB"
+    },
+    {
+      "cpu": 659.32,
+      "ram": 1316407476,
+      "ram_humanized": "1.23GB"
+    },
+    {
+      "cpu": 593.63,
+      "ram": 1319628701,
+      "ram_humanized": "1.23GB"
+    },
+    {
+      "cpu": 483.95,
+      "ram": 1330366119,
+      "ram_humanized": "1.24GB"
+    },
+    {
+      "cpu": 556.61,
+      "ram": 1344324763,
+      "ram_humanized": "1.25GB"
+    },
+    {
+      "cpu": 177.14,
+      "ram": 1346472247,
+      "ram_humanized": "1.25GB"
+    },
+    {
+      "cpu": 0.24,
+      "ram": 1346472247,
+      "ram_humanized": "1.25GB"
+    },
+    {
+      "cpu": 0.12,
+      "ram": 1346472247,
+      "ram_humanized": "1.25GB"
+    }
+  ],
+  "cpu_min_humanized": "0.12%",
+  "cpu_max_humanized": "659.32%",
+  "cpu_avg_humanized": "426.83%",
+  "ram_min_humanized": "1.2GB",
+  "ram_max_humanized": "1.25GB",
+  "ram_avg_humanized": "1.23GB"
+}

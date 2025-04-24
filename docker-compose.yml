@@ -1,5 +1,4 @@
 services:
-
   benchmarks-node:
     container_name: benchmarks-node
     depends_on:
@@ -12,7 +11,7 @@ services:
     networks:
       - benchmarks-network
     ports:
-      - "3000:30000"
+      - '3000:30000'
     env_file:
       - .env
 
@@ -28,12 +27,12 @@ services:
     networks:
       - benchmarks-network
     ports:
-      - "3001:30000"
+      - '3001:30000'
     env_file:
       - .env
 
   benchmarks-rust:
-    container_name: benchmarks-rust 
+    container_name: benchmarks-rust
     depends_on:
       - benchmarks-postgres
     build:
@@ -44,7 +43,7 @@ services:
     networks:
       - benchmarks-network
     ports:
-      - "3002:30000"
+      - '3002:30000'
     env_file:
       - .env
 
@@ -55,7 +54,7 @@ services:
     networks:
       - benchmarks-network
     ports:
-      - "5432:5432"
+      - '5432:5432'
     env_file:
       - .env
 

@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize } from 'sequelize'
 
 // environment variables will be passed directly in docker-compose.yml
 const host = process.env.POSTGRES_HOST
@@ -15,4 +15,4 @@ export const sequelize = new Sequelize({
   database,
   dialect: 'postgres',
   logging: false,
-});
+})
