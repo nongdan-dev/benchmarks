@@ -1,5 +1,5 @@
 # =============================================================================
-# benchmark
+# benchmarks
 
 node_restful:
 	docker-compose exec benchmarks-wrk wrk -t4 -c200 -d30s --latency -s ./scripts/restful.lua http://benchmarks-node:30000/users;
@@ -33,12 +33,18 @@ rgo:
 	&& export RUN=benchmarks-go \
 	&& make -Bs _run;
 
+# also recompile the binary
+rgo2:
+	rm -f ./go/build/benchmarks-go \
+	&& make -Bs rgo;
+
 rrust:
 	make -Bs krust \
 	&& export RUN=benchmarks-rust \
 	&& make -Bs _run;
 
-rbrust:
+# also recompile the binary
+rrust2:
 	rm -f ./rust/target/release/rust \
 	&& make -Bs rrust;
 
