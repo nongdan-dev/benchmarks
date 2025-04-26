@@ -3,13 +3,21 @@ import fs from 'node:fs'
 import { promisify } from 'node:util'
 import bytes from 'bytes'
 import prettyMs from 'pretty-ms'
+import { cpus } from 'node:os'
+import {
+  DockerStats,
+  DockerStatsRaw,
+  WrkOptions,
+  WrkStats
+} from "./type"
 
 const execAsync = promisify(exec)
 
 const main = async () => {
-  // TODO get cpu info
+  // TODO get cpu info  
   // cpu % is relative and depends on the host machine
   // need to get cpu info to have a better point of view
+  console.log('CPU Info:', cpus().pop());
 
   await Promise.all([warmup('node'), warmup('go'), warmup('rust')])
 
@@ -45,49 +53,8 @@ const warmup = async (name: string) => {
   console.log(`done warm up for ${name}`)
 }
 
-type DockerStats = {
-  cpu_min: number
-  cpu_max: number
-  cpu_avg: number
-  ram_min: number
-  ram_max: number
-  ram_avg: number
-  cpu_min_humanized?: string | null
-  cpu_max_humanized?: string | null
-  cpu_avg_humanized?: string | null
-  ram_min_humanized?: string | null
-  ram_max_humanized?: string | null
-  ram_avg_humanized?: string | null
-  raw: DockerStatsRaw[]
-}
-type DockerStatsRaw = {
-  cpu: number
-  ram: number
-  ram_humanized: string
-}
-type WrkStats = {
-  duration: number
-  total_requests: number
-  requests_per_second: number
-  transfer_per_second: number
-  latency_p50: number
-  latency_p90: number
-  latency_p99: number
-  latency_p9999: number
-  latency_min: number
-  latency_max: number
-  latency_avg: number
-  // extra
-  requests_per_second_humanized?: string | null
-  transfer_per_second_humanized?: string | null
-  latency_p50_humanized?: string | null
-  latency_p90_humanized?: string | null
-  latency_p99_humanized?: string | null
-  latency_p9999_humanized?: string | null
-  latency_min_humanized?: string | null
-  latency_max_humanized?: string | null
-  latency_avg_humanized?: string | null
-}
+
+
 
 const getCpuRamUsage2 = (name: string, total = 30) => {
   let resolveFn: Function | undefined = undefined
@@ -114,6 +81,8 @@ const getCpuRamUsage2 = (name: string, total = 30) => {
     json.ram_min_humanized = bytes(json.ram_min)
     json.ram_max_humanized = bytes(json.ram_max)
     json.ram_avg_humanized = bytes(json.ram_avg)
+    json.cpu_info_humanized = cpus().pop(),
+
     fs.writeFileSync(`vite/src/assets/${name}_stats.json`, JSON.stringify(json, null, 2), 'utf-8')
     console.log(`done write json docker stats for ${name}`)
     resolveFn?.()
@@ -155,11 +124,19 @@ const getCpuRamUsage = async (name: string) => {
 }
 
 const runGraphql = async (name: string, duration: number) => {
-  console.log(`start running wrk for ${name}`)
+  console.log(`start running wrk for ${name}....`)
   // TODO research and adjust wrk params to maximize number of concurrent connection
+  /**
+   * Tips for Maximizing Concurrent Connections
+   *      - Increase -c until system limits are reached
+   *      - Use more threads(-t), set it close to your number of logical CPU cores
+   *      - System tuning: Increase file descriptor limits
+   */
   await wrk({
     name,
     duration,
+    concurrent: 1200,
+    threads:12,
     script: 'graphql',
   })
   const str = fs.readFileSync('wrk/output/benchmark.json', 'utf-8')
@@ -174,16 +151,12 @@ const runGraphql = async (name: string, duration: number) => {
   json.latency_min_humanized = humanizeNanosecond(json.latency_min)
   json.latency_max_humanized = humanizeNanosecond(json.latency_max)
   json.latency_avg_humanized = humanizeNanosecond(json.latency_avg)
+  json.cpu_info_humanized = cpus().pop()
+
   fs.writeFileSync(`vite/src/assets/${name}_wrk.json`, JSON.stringify(json, null, 2), 'utf-8')
 }
 
-type WrkOptions = {
-  name: string
-  script: string
-  threads?: number
-  concurrent?: number
-  duration?: number
-}
+
 const wrk = async (p: WrkOptions) => {
   const name = p.name
   const script = p.script
