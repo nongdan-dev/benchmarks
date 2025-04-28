@@ -1,23 +1,22 @@
 import './App.css'
-import RustBenchmark from './components/Benchmark/Benchmark'
-// import GoStatsChart from './components/Stats/GoStatsChart'
-// import NodeStatsChart from './components/Stats/NodeStatsChart'
-// import RustStatsChart from './components/Stats/RustStatsChart'
-import StatsChart from './components/Stats/StatsChart'
+
+import PerformanceStatsChart from './components/Benchmark/PerformanceStatsChart'
+import DockerStatsChart from './components/Stats/DockerStatsChart'
 
 function App() {
  
   return (
     <div className='grid grid-cols-1' >
-      <div className='w-full justify-between'>
+      <div className='w-full justify-between p-10'>
         <h1 className='font-bold py-10'>Docker Stats Chart</h1>
-        <StatsChart/>
-        {/* <GoStatsChart/>
-        <NodeStatsChart/>
+        {/* <StatsChart/> */}
+        {/* <MixedChart/> */}
+        <DockerStatsChart/>
+        {/* <NodeStatsChart/>
         <RustStatsChart/> */}
 
         <h1 className='font-bold py-10'>Benchmarks Chart</h1>
-        <RustBenchmark/>
+        <PerformanceStatsChart/>
 
       </div>
     </div>

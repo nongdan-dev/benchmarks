@@ -1,82 +1,82 @@
 {
   "cpu_min": 0.21,
-  "cpu_max": 753.69,
-  "cpu_avg": 652.96,
-  "ram_min": 1449551462,
-  "ram_max": 1614907703,
-  "ram_avg": 1580059900,
+  "cpu_max": 742.98,
+  "cpu_avg": 647.87,
+  "ram_min": 1407675531,
+  "ram_max": 1594506608,
+  "ram_avg": 1548530935,
   "raw": [
     {
-      "cpu": 753.69,
-      "ram": 1449551462,
-      "ram_humanized": "1.35GB"
+      "cpu": 739.92,
+      "ram": 1407675531,
+      "ram_humanized": "1.31GB"
     },
     {
-      "cpu": 736.75,
-      "ram": 1546188226,
+      "cpu": 734.6,
+      "ram": 1515049713,
+      "ram_humanized": "1.41GB"
+    },
+    {
+      "cpu": 726.87,
+      "ram": 1522565906,
+      "ram_humanized": "1.42GB"
+    },
+    {
+      "cpu": 730.71,
+      "ram": 1527934615,
+      "ram_humanized": "1.42GB"
+    },
+    {
+      "cpu": 734.16,
+      "ram": 1548335710,
       "ram_humanized": "1.44GB"
     },
     {
-      "cpu": 721.83,
-      "ram": 1557999386,
-      "ram_humanized": "1.45GB"
+      "cpu": 728.27,
+      "ram": 1564441837,
+      "ram_humanized": "1.46GB"
     },
     {
-      "cpu": 722.8,
-      "ram": 1574105513,
+      "cpu": 724.7,
+      "ram": 1579474223,
       "ram_humanized": "1.47GB"
     },
     {
-      "cpu": 733.54,
-      "ram": 1591285383,
+      "cpu": 742.98,
+      "ram": 1589137899,
       "ram_humanized": "1.48GB"
     },
     {
-      "cpu": 710.49,
-      "ram": 1600949059,
-      "ram_humanized": "1.49GB"
+      "cpu": 705.73,
+      "ram": 1594506608,
+      "ram_humanized": "1.48GB"
     },
     {
-      "cpu": 707.46,
-      "ram": 1606317768,
-      "ram_humanized": "1.5GB"
-    },
-    {
-      "cpu": 691.17,
-      "ram": 1610612736,
-      "ram_humanized": "1.5GB"
-    },
-    {
-      "cpu": 719.71,
-      "ram": 1614907703,
-      "ram_humanized": "1.5GB"
-    },
-    {
-      "cpu": 684.86,
-      "ram": 1614907703,
-      "ram_humanized": "1.5GB"
+      "cpu": 558.42,
+      "ram": 1592359124,
+      "ram_humanized": "1.48GB"
     },
     {
       "cpu": 0.21,
-      "ram": 1613833961,
-      "ram_humanized": "1.5GB"
+      "ram": 1592359124,
+      "ram_humanized": "1.48GB"
     }
   ],
   "cpu_min_humanized": "0.21%",
-  "cpu_max_humanized": "753.69%",
-  "cpu_avg_humanized": "652.96%",
-  "ram_min_humanized": "1.35GB",
-  "ram_max_humanized": "1.5GB",
-  "ram_avg_humanized": "1.47GB",
+  "cpu_max_humanized": "742.98%",
+  "cpu_avg_humanized": "647.87%",
+  "ram_min_humanized": "1.31GB",
+  "ram_max_humanized": "1.48GB",
+  "ram_avg_humanized": "1.44GB",
   "cpu_info_humanized": {
     "model": "Intel(R) Core(TM) i5-8250U CPU @ 1.60GHz",
     "speed": 1800,
     "times": {
-      "user": 561687,
+      "user": 1803468,
       "nice": 0,
-      "sys": 420328,
-      "idle": 7804953,
-      "irq": 30593
+      "sys": 762718,
+      "idle": 9199828,
+      "irq": 82687
     }
   }
 }
