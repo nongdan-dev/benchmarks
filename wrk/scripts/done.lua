@@ -6,6 +6,8 @@ function M.done(summary, latency, requests)
 
   file:write(string.format('"duration": %.2f,\n', summary.duration / 1e6))
   file:write(string.format('"total_requests": %d,\n', summary.requests))
+  -- TODO add total failure requests
+
   file:write(string.format('"requests_per_second": %.2f,\n', summary.requests / (summary.duration / 1e6)))
   file:write(string.format('"transfer_per_second": %.2f,\n', summary.bytes / (summary.duration / 1e6)))
 

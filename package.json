@@ -7,8 +7,7 @@
     "lint": "prettier --log-level=error --write ."
   },
   "dependencies": {
-    "bytes": "3.1.2",
-    "pretty-ms": "7.0.1"
+    "bytes": "3.1.2"
   },
   "devDependencies": {
     "@types/bytes": "3.1.5",

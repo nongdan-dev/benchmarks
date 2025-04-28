@@ -35,13 +35,13 @@ rwrk:
 # kill and cleanup, then rebuild the docker image and run, for all services
 run:
 	make -Bs kill \
-	&& export RUN="benchmarks-node benchmarks-rust benchmarks-wrk benchmarks-go" \
+	&& export RUN="benchmarks-node benchmarks-go benchmarks-rust benchmarks-wrk" \
 	&& make -Bs _run;
 
 # shortcut to rebuild the docker image and run
 _run:
-	docker-compose build $(RUN) --force-rm \
-	&& docker-compose up $(RUN) -d --remove-orphans;
+	docker compose build $(RUN) --force-rm \
+	&& docker compose up $(RUN) -d --remove-orphans;
 
 # =============================================================================
 # kill and cleanup

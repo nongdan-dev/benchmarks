@@ -1,36 +1,44 @@
 import { exec } from 'node:child_process'
-import fs from 'node:fs'
+import fs from 'node:fs/promises'
 import { promisify } from 'node:util'
 import bytes from 'bytes'
-import prettyMs from 'pretty-ms'
-import { cpus } from 'node:os'
-import {
-  DockerStats,
-  DockerStatsRaw,
-  WrkOptions,
-  WrkStats
-} from "./type"
+import { DockerStats, DockerStatsRaw, WrkStats } from './vite/src/assets'
+import path from 'node:path'
 
 const execAsync = promisify(exec)
 
+const names = ['node', 'go', 'rust']
+const concurrents = [100, 1000, 10000]
+
 const main = async () => {
-  // TODO get cpu info  
-  // cpu % is relative and depends on the host machine
-  // need to get cpu info to have a better point of view
-  console.log('CPU Info:', cpus().pop());
+  console.log('get cpu info...')
+  const cpu = await lscpu()
+  console.log(`${cpu.cpu_cores} cores cpu: ${cpu.cpu_info}`)
 
-  await Promise.all([warmup('node'), warmup('go'), warmup('rust')])
+  console.log(`warm up and check wrk...`)
+  await Promise.all(names.map(warmup))
 
-  const d = 10
-  await Promise.all([runGraphql('node', d), getCpuRamUsage2('node', d)])
-  await Promise.all([runGraphql('go', d), getCpuRamUsage2('go', d)])
-  await Promise.all([runGraphql('rust', d), getCpuRamUsage2('rust', d)])
+  const duration = 60
+  for (const name of names) {
+    for (const concurrent of concurrents) {
+      const o: WrkOptions = {
+        name,
+        concurrent,
+        duration,
+        threads: cpu.cpu_cores,
+        script: 'graphql',
+      }
+      console.log(`${key(o)}...`)
+      await Promise.all([wrk(o), usage(o)])
+      await merge(o)
+    }
+  }
 }
 
 // warm up to avoid cold start (neu khong biet thi research)
 // make sure wrk response correct json with data from database
 const warmup = async (name: string) => {
-  const r = await wrk({
+  const r = await _wrk({
     name,
     script: 'graphql-test',
     threads: 1,
@@ -40,23 +48,20 @@ const warmup = async (name: string) => {
   try {
     const i1 = r.stdout.indexOf('{')
     const i2 = r.stdout.lastIndexOf('}')
-    const json = JSON.parse(r.stdout.substring(i1, i2 + 1))
-    if (json.data.users.length !== 1) {
-      throw new Error('json.data.user.length !== 1')
+    const d = JSON.parse(r.stdout.substring(i1, i2 + 1))
+    if (d.data.users.length !== 1) {
+      throw new Error('d.data.user.length !== 1')
     }
   } catch (err) {
-    console.log(err)
-    console.log(`failed to get response for ${name}`)
-    console.log(r.stdout)
+    console.error(`warmup ${name} error:`)
+    console.error(err)
+    console.error(r.stdout)
+    console.error(r.stderr)
     process.exit(1)
   }
-  console.log(`done warm up for ${name}`)
 }
 
-
-
-
-const getCpuRamUsage2 = (name: string, total = 30) => {
+const usage = (o: WrkOptions) => {
   let resolveFn: Function | undefined = undefined
   const promise = new Promise(r => {
     resolveFn = r
@@ -65,115 +70,120 @@ const getCpuRamUsage2 = (name: string, total = 30) => {
   const promises: Promise<DockerStatsRaw>[] = []
   const callback = async () => {
     const arr = await Promise.all(promises)
-    const json: DockerStats = {
-      cpu_min: Math.min(...arr.map(v => v.cpu)),
-      cpu_max: Math.max(...arr.map(v => v.cpu)),
-      cpu_avg: Number((arr.reduce((t, v) => t + v.cpu, 0) / arr.length).toFixed(2)),
-      ram_min: Math.min(...arr.map(v => v.ram)),
-      ram_max: Math.max(...arr.map(v => v.ram)),
-      ram_avg: Math.round(arr.reduce((t, v) => t + v.ram, 0) / arr.length),
-      raw: arr,
+    const d: DockerStats = {
+      usage_raw: arr,
+      ...(null as any),
     }
-    // TODO: humanized can be done on vite code
-    json.cpu_min_humanized = `${json.cpu_min}%`
-    json.cpu_max_humanized = `${json.cpu_max}%`
-    json.cpu_avg_humanized = `${json.cpu_avg}%`
-    json.ram_min_humanized = bytes(json.ram_min)
-    json.ram_max_humanized = bytes(json.ram_max)
-    json.ram_avg_humanized = bytes(json.ram_avg)
-    json.cpu_info_humanized = cpus().pop(),
-
-    fs.writeFileSync(`vite/src/assets/${name}_stats.json`, JSON.stringify(json, null, 2), 'utf-8')
-    console.log(`done write json docker stats for ${name}`)
+    await writeAsset(statsFilename(o), d)
     resolveFn?.()
     resolveFn = undefined
   }
 
   let count = 0
   const id = setInterval(() => {
-    if (count > total) {
+    if (count > o.duration) {
       clearInterval(id)
       callback()
       return
     }
-    promises.push(getCpuRamUsage(name))
+    promises.push(_usage(o.name))
     count += 1
   }, 1000)
 
   return promise
 }
 
-const getCpuRamUsage = async (name: string) => {
+const _usage = async (name: string) => {
   const { stdout: stats } = await execAsync(
-    `docker stats --no-stream --format "{{.CPUPerc}},{{.MemUsage}}" "benchmarks-${name}"`,
+    `docker stats --no-stream --format "{{.CPUPerc}},{{.MemUsage}}" benchmarks-${name}`,
   )
   // get cpu % and ram usage in bytes number
   const statsParts = stats.trim().split(',')
-  const cpu = statsParts[0]
-  const ram = statsParts[1]
-  const ramUsage = ram.split('/')[0].trim().replace('i', '')
-  const ramUsageBytes = bytes(ramUsage) || 0
-  // TODO: humanized can be done on vite code
-  const ram_humanized = bytes(ramUsageBytes) || ''
-  const data: DockerStatsRaw = {
-    cpu: Number(cpu.replace('%', '')),
+  const cpu = statsParts[0].replace('%', '').trim()
+  const ram = statsParts[1].split('/')[0].trim().replace('i', '')
+  const ramUsageBytes = bytes(ram) || 0
+  const d: DockerStatsRaw = {
+    cpu: Number(cpu),
     ram: ramUsageBytes,
-    ram_humanized,
+    ...(null as any),
   }
-  return data
+  return d
 }
 
-const runGraphql = async (name: string, duration: number) => {
-  console.log(`start running wrk for ${name}....`)
-  // TODO research and adjust wrk params to maximize number of concurrent connection
-  /**
-   * Tips for Maximizing Concurrent Connections
-   *      - Increase -c until system limits are reached
-   *      - Use more threads(-t), set it close to your number of logical CPU cores
-   *      - System tuning: Increase file descriptor limits
-   */
-  await wrk({
-    name,
-    duration,
-    concurrent: 1200,
-    threads:12,
-    script: 'graphql',
-  })
-  const str = fs.readFileSync('wrk/output/benchmark.json', 'utf-8')
-  // TODO: humanized can be done on vite code
-  const json: WrkStats = JSON.parse(str)
-  json.requests_per_second_humanized = bytes(json.requests_per_second)
-  json.transfer_per_second_humanized = bytes(json.transfer_per_second)
-  json.latency_p50_humanized = humanizeNanosecond(json.latency_p50)
-  json.latency_p90_humanized = humanizeNanosecond(json.latency_p90)
-  json.latency_p99_humanized = humanizeNanosecond(json.latency_p99)
-  json.latency_p9999_humanized = humanizeNanosecond(json.latency_p9999)
-  json.latency_min_humanized = humanizeNanosecond(json.latency_min)
-  json.latency_max_humanized = humanizeNanosecond(json.latency_max)
-  json.latency_avg_humanized = humanizeNanosecond(json.latency_avg)
-  json.cpu_info_humanized = cpus().pop()
-
-  fs.writeFileSync(`vite/src/assets/${name}_wrk.json`, JSON.stringify(json, null, 2), 'utf-8')
+type WrkOptions = {
+  name: string
+  script: string
+  threads: number
+  concurrent: number
+  duration: number
 }
-
-
-const wrk = async (p: WrkOptions) => {
-  const name = p.name
-  const script = p.script
-  const threads = p.threads || 4
-  const concurrent = p.concurrent || 1000
-  const duration = p.duration || 60
-  return execAsync(
-    `docker compose exec benchmarks-wrk wrk -t${threads} -c${concurrent} -d${duration}s --latency -s ./scripts/${script}.lua http://benchmarks-${name}:30000`,
+const wrk = async (o: WrkOptions) => {
+  await _wrk(o)
+  const d: WrkStats = await readWrkBenchmark()
+  await writeAsset(wrkFilename(o), d)
+}
+const _wrk = (o: WrkOptions) =>
+  execAsync(
+    `docker compose exec benchmarks-wrk wrk -t${o.threads} -c${o.concurrent} -d${o.duration}s --latency -s ./scripts/${o.script}.lua http://benchmarks-${o.name}:30000`,
   )
+
+const merge = async (o: WrkOptions) => {
+  const k1 = wrkFilename(o)
+  const k2 = statsFilename(o)
+  const json1 = await readAsset(k1)
+  const json2 = await readAsset(k2)
+  const promise = writeAsset(key(o), {
+    ...json1,
+    ...json2,
+  })
+  const promises = [k1, k2].map(k => path.join(assetsPath, `${k}.json`)).map(p => fs.rm(p))
+  promises.push(promise)
+  await Promise.all(promises)
 }
 
-const humanizeNanosecond = (ns: number) => {
-  if (ns < 1000) {
-    return `${ns}ns`
+// cpu % is relative and depends on the host machine
+// need to get cpu info to have a better point of view
+const lscpu = async () => {
+  const { stdout } = await execAsync(`docker compose exec benchmarks-wrk lscpu`)
+  let cpu_info = ''
+  let cpu_cores = 0
+  let cpu_speed = 0
+  stdout.split('/n').forEach(line => {
+    const m1 = /Model name:\s+(.+)/.exec(line)
+    if (m1) {
+      cpu_info = m1[1]
+    }
+    const m2 = /CPU\(s\):\s+(\d+)/.exec(line)
+    if (m2) {
+      cpu_cores = Number(m2[1])
+    }
+    const m3 = /CPU MHz:\s+(.+)/.exec(line)
+    if (m3) {
+      cpu_speed = Number(m3[1])
+    }
+  })
+  const cpu = {
+    cpu_info,
+    cpu_cores,
+    cpu_speed,
   }
-  return prettyMs(ns / 1000)
+  await writeAsset('cpu', cpu)
+  return cpu
 }
+
+const key = (o: WrkOptions) => `${o.name}_${o.concurrent}`
+const wrkFilename = (o: WrkOptions) => `${key(o)}_wrk`
+const statsFilename = (o: WrkOptions) => `${key(o)}_stats`
+
+const assetsPath = path.join(__dirname, './vite/src/assets')
+const writeAsset = (f: string, d: any) => writeJson(path.join(assetsPath, f), d)
+const readAsset = (f: string) => readJson(path.join(assetsPath, f))
+
+const wrkOutputPath = path.join(__dirname, './wrk/output')
+const readWrkBenchmark = () => readJson(path.join(wrkOutputPath, 'benchmark'))
+
+const writeJson = (f: string, d: any) => fs.writeFile(`${f}.json`, JSON.stringify(d), 'utf-8')
+const readJson = (f: string) => fs.readFile(`${f}.json`, 'utf-8').then(JSON.parse)
 
 main().catch(err => {
   console.error(err)
