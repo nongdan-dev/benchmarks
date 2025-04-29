@@ -33,6 +33,8 @@ export type WrkStats = {
   latency_min_humanized: string
   latency_max_humanized: string
   latency_avg_humanized: string
+  latency_tm999: number,
+  latency_stdev: number,
 }
 
 export type DockerStats = {

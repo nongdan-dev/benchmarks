@@ -1,12 +1,19 @@
 local M = {}
 
 function M.done(summary, latency, requests)
+  local total_failures = (summary.errors.connect or 0) +
+                         (summary.errors.read or 0) +
+                         (summary.errors.write or 0) +
+                         (summary.errors.status or 0) +
+                         (summary.errors.timeout or 0)
   local file = io.open("./output/benchmark.json", "w+")
   file:write("{\n")
 
   file:write(string.format('"duration": %.2f,\n', summary.duration / 1e6))
   file:write(string.format('"total_requests": %d,\n', summary.requests))
   -- TODO add total failure requests
+  file:write(string.format('"total_failures": %d,\n', total_failures))
+
 
   file:write(string.format('"requests_per_second": %.2f,\n', summary.requests / (summary.duration / 1e6)))
   file:write(string.format('"transfer_per_second": %.2f,\n', summary.bytes / (summary.duration / 1e6)))
@@ -18,7 +25,12 @@ function M.done(summary, latency, requests)
 
   file:write(string.format('"latency_min": %.2f,\n', latency.min))
   file:write(string.format('"latency_max": %.2f,\n', latency.max))
-  file:write(string.format('"latency_avg": %.2f\n', latency.mean))
+  file:write(string.format('"latency_avg": %.2f,\n', latency.mean))
+
+  file:write(string.format('"latency_tm999": %.2f,\n', latency:percentile(99.9)))
+  file:write(string.format('"latency_stdev": %.2f\n', latency.stdev))
+
+
 
   file:write("}\n")
   file:close()

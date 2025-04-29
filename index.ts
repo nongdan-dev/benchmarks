@@ -18,7 +18,7 @@ const main = async () => {
   console.log(`warm up and check wrk...`)
   await Promise.all(names.map(warmup))
 
-  const duration = 60
+  const duration = 5
   for (const name of names) {
     for (const concurrent of concurrents) {
       const o: WrkOptions = {
