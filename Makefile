@@ -2,10 +2,29 @@
 # rebuild the docker image and run
 # by default, this will not recompile the code if there is corresponding binary
 
+rexpress: rnode;
+
+rnest:
+	export ENV="PLATFORM=nest" \
+	&& make -Bs rnode;
+
+rcluster:
+	export ENV="PLATFORM=express CLUSTER=1" \
+	&& make -Bs rnode;
+
+rultimate:
+	export ENV="PLATFORM=ultimate CLUSTER=1" \
+	&& make -Bs rnode;
+
 rnode:
 	make -Bs knode \
 	&& export RUN=benchmarks-node \
 	&& make -Bs _run;
+
+# also rebuild tsc dist
+rnode2:
+	rm -f ./node/dist \
+	&& make -Bs rnode;
 
 rgo:
 	make -Bs kgo \
@@ -41,7 +60,7 @@ run:
 # shortcut to rebuild the docker image and run
 _run:
 	docker compose build $(RUN) --force-rm \
-	&& docker compose up $(RUN) -d --remove-orphans;
+	&& $(ENV) docker compose up $(RUN) -d --remove-orphans;
 
 # =============================================================================
 # kill and cleanup
@@ -71,4 +90,4 @@ kill:
 _kill:
 	((docker kill $$(docker ps -q --no-trunc --filter name=^$(KILL)) > /dev/null 2>&1) || true) \
 	&& ((docker rm -f $$(docker ps -a -q --no-trunc --filter name=^$(KILL)) > /dev/null 2>&1) || true) \
-	&& ((docker rmi -f $$(docker images -f "dangling=true" -q --no-trunc) > /dev/null 2>&1) || true);
+	&& ((docker rmi -f $$(docker images -f dangling=true -q --no-trunc) > /dev/null 2>&1) || true);

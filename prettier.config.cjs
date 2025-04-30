@@ -16,7 +16,7 @@ module.exports = {
   quoteProps: 'as-needed',
   embeddedLanguageFormatting: 'auto',
   singleAttributePerLine: true,
-  printWidth: 100,
+  printWidth: 80,
   tabWidth: 2,
   useTabs: false,
   plugins: ['prettier-plugin-tailwindcss'],

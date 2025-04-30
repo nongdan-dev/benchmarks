@@ -1,9 +1,13 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "target": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "strict": true
+    "allowJs": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true
   },
-  "include": ["index.ts"]
+  "include": ["**/*"]
 }

@@ -14,6 +14,10 @@ services:
       - '30000:30000'
     env_file:
       - .env
+    environment:
+      - NODE_ENVIRONMENT=production
+      - PLATFORM=${PLATFORM:-express}
+      - CLUSTER=${CLUSTER:-}
 
   benchmarks-go:
     container_name: benchmarks-go

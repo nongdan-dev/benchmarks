@@ -1,38 +1,83 @@
 local M = {}
 
 function M.done(summary, latency, requests)
-  local total_failures = (summary.errors.connect or 0) +
-                         (summary.errors.read or 0) +
-                         (summary.errors.write or 0) +
-                         (summary.errors.status or 0) +
-                         (summary.errors.timeout or 0)
-  local file = io.open("./output/benchmark.json", "w+")
-  file:write("{\n")
+  function try_get_latency(i)
+    -- wrk
+    local ok, value = pcall(function() return latency(i) end)
+    if ok then
+      return value
+    end
+    -- wrk2
+    return latency[i]
+  end
 
-  file:write(string.format('"duration": %.2f,\n', summary.duration / 1e6))
-  file:write(string.format('"total_requests": %d,\n', summary.requests))
-  -- TODO add total failure requests
-  file:write(string.format('"total_failures": %d,\n', total_failures))
+  local size = #latency
+  local latencies = {}
+  for i = 1, size do
+    latencies[i] = try_get_latency(i)
+  end
+  table.sort(latencies)
 
+  function tm(n)
+    local tail_count = math.floor(size * (100 - n) / 100)
+    if tail_count == 0 then
+      tail_count = 1
+    end
+    local sum = 0
+    for i = size - tail_count + 1, size do
+      sum = sum + latencies[i]
+    end
+    return sum / tail_count
+  end
 
-  file:write(string.format('"requests_per_second": %.2f,\n', summary.requests / (summary.duration / 1e6)))
-  file:write(string.format('"transfer_per_second": %.2f,\n', summary.bytes / (summary.duration / 1e6)))
+  local file = io.open('./output/benchmark.json', 'w+')
+  function w(key, tpl, value, eof)
+    file:write(('  "%s": %s'):format(key, tpl:format(value)))
+    if not eof then
+      file:write(',')
+    end
+    file:write('\n')
+  end
 
-  file:write(string.format('"latency_p50": %.2f,\n', latency:percentile(50.0)))
-  file:write(string.format('"latency_p90": %.2f,\n', latency:percentile(90.0)))
-  file:write(string.format('"latency_p99": %.2f,\n', latency:percentile(99.0)))
-  file:write(string.format('"latency_p9999": %.2f,\n', latency:percentile(99.99)))
+  file:write('{')
+  file:write('\n')
 
-  file:write(string.format('"latency_min": %.2f,\n', latency.min))
-  file:write(string.format('"latency_max": %.2f,\n', latency.max))
-  file:write(string.format('"latency_avg": %.2f,\n', latency.mean))
+  w('duration', '%d', summary.duration)
+  w('total_requests', '%d', summary.requests)
 
-  file:write(string.format('"latency_tm999": %.2f,\n', latency:percentile(99.9)))
-  file:write(string.format('"latency_stdev": %.2f\n', latency.stdev))
+  local ec = summary.errors.connect
+  local er = summary.errors.read
+  local ew = summary.errors.write
+  local es = summary.errors.status
+  local et = summary.errors.timeout
+  w('total_errors', '%d', ec + er + ew + es + et)
+  w('errors_connect', '%d', ec)
+  w('errors_read', '%d', er)
+  w('errors_write', '%d', ew)
+  w('errors_status', '%d', es)
+  w('errors_timeout', '%d', et)
 
+  w('requests_per_second', '%d', summary.requests / (summary.duration / 1e6))
+  w('transfer_per_second', '%d', summary.bytes / (summary.duration / 1e6))
 
+  w('latency_p50', '%d', latency:percentile(50.0))
+  w('latency_p90', '%d', latency:percentile(90.0))
+  w('latency_p99', '%d', latency:percentile(99.0))
+  w('latency_p999', '%d', latency:percentile(99.9))
+  w('latency_p9999', '%d', latency:percentile(99.99))
+  w('latency_tm99', '%d', tm(99))
+  w('latency_tm999', '%d', tm(99.9))
+  w('latency_tm9999', '%d', tm(99.99))
 
-  file:write("}\n")
+  w('latency_min', '%d', latency.min)
+  w('latency_max', '%d', latency.max)
+  w('latency_avg', '%d', latency.mean)
+
+  w('latency_stdev', '%d', latency.stdev, true)
+
+  file:write('}')
+  file:write('\n')
+
   file:close()
 end
 

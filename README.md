@@ -1,4 +1,4 @@
-# HTTP API Benchmarks
+# http api benchmarks
 
-- NodeJS, Go, Rust
-- PostgreSQL, RESTful, GraphQL
+- rust, go, nodejs
+- postgresql, graphql
