@@ -49,7 +49,31 @@ const cases: Case[] = [
     wrk2: false,
   },
   {
+    concurrent: 300,
+    wrk2: false,
+  },
+  {
+    concurrent: 500,
+    wrk2: false,
+  },
+  {
+    concurrent: 700,
+    wrk2: false,
+  },
+  {
     concurrent: 1000,
+    wrk2: true,
+  },
+  {
+    concurrent: 3000,
+    wrk2: true,
+  },
+  {
+    concurrent: 5000,
+    wrk2: true,
+  },
+  {
+    concurrent: 7000,
     wrk2: true,
   },
 ]
@@ -198,12 +222,17 @@ const wrk = async (o: WrkOptions) => {
   await _wrk(o)
   return readWrkJson()
 }
-const _wrk = async (o: WrkOptions) =>
-  exec(
-    `docker exec benchmarks-wrk ${o.wrk2 ? 'wrk2' : 'wrk'} -t${o.threads} -d${o.duration} -${
-      o.wrk2 ? 'R' : 'c'
-    }${o.concurrent} --latency -s ./scripts/${o.script}.lua http://benchmarks-${o.platform}:30000`,
-  )
+const _wrk = async (o: WrkOptions) => {
+  const cmd = o.wrk2 ? 'wrk2' : 'wrk'
+  const t = `-t${o.threads}`
+  const d = `-d${o.duration}`
+  const c = `-c${o.wrk2 ? 100 : o.concurrent}`
+  const r = o.wrk2 ? `-R${o.concurrent}` : ''
+  const s = `-s ./scripts/${o.script}.lua`
+  const u = `http://benchmarks-${o.platform}:30000`
+  return _execWrk(`${cmd} ${t} ${d} ${c} ${r} --latency ${s} ${u}`)
+}
+const _execWrk = (cmd: string) => exec(`docker exec benchmarks-wrk ${cmd}`)
 
 /*
  * Cpu % is relative and depends on the host machine

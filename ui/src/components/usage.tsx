@@ -41,7 +41,10 @@ export const Usage = ({ data }: { data: BData[] }) => (
         />
 
         <Tooltip
-          formatter={(_, name, item) =>  [item.payload[`${item.dataKey}_humanized`], name]}
+          formatter={(_, name, item) => [
+            item.payload[`${item.dataKey}_humanized`],
+            name,
+          ]}
         />
 
         <Legend />

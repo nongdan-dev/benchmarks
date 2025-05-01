@@ -12,13 +12,13 @@ export const Table: React.FC<TableViewProps> = ({ data }) => (
     <table className='max-w-full table-auto rounded-lg bg-white shadow-lg'>
       <thead>
         <tr className='border bg-gray-800 text-white'>
-          <th className='border border-gray-800 px-4 py-2 text-left' />
-          <th className='border border-gray-800 px-4 py-2 text-right'>Avg</th>
+          <th className='border border-gray-800 px-4 py-2' />
+          <th className='border border-gray-800 px-4 py-2 text-right'>avg</th>
           <th className='border border-gray-800 px-4 py-2 text-right'>p50</th>
           <th className='border border-gray-800 px-4 py-2 text-right'>p90</th>
           <th className='border border-gray-800 px-4 py-2 text-right'>p99</th>
           <th className='border border-gray-800 px-4 py-2 text-right'>tm99</th>
-          <th className='border border-gray-800 px-4 py-2 text-right'>Max</th>
+          <th className='border border-gray-800 px-4 py-2 text-right'>max</th>
           <th className='border border-gray-800 px-4 py-2 text-right'>stdev</th>
         </tr>
       </thead>
