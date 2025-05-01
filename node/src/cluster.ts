@@ -7,10 +7,11 @@ export const fork = (start: Function) => {
     return
   }
   const n = os.availableParallelism()
+  console.log(`node using ${n} cpu`)
   for (let i = 0; i < n; i++) {
     cluster.fork()
   }
-  cluster.on('exit', worker => {
+  cluster.on('exit', () => {
     cluster.fork()
   })
 }

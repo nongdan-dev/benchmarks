@@ -13,20 +13,20 @@ import type {
 } from './ui/src/assets/benchmark'
 
 const exec = promisify(execWithCallback)
-const duration = 60
+const duration = 30
 const frameworks = [
-  {
-    platform: 'node',
-    framework: 'express',
-  },
+  // {
+  //   platform: 'node',
+  //   framework: 'express',
+  // },
   // {
   //   platform: 'node',
   //   framework: 'nest',
   // },
-  {
-    platform: 'node',
-    framework: 'cluster',
-  },
+  // {
+  //   platform: 'node',
+  //   framework: 'cluster',
+  // },
   {
     platform: 'node',
     framework: 'ultimate',
@@ -48,34 +48,26 @@ const cases: Case[] = [
     concurrent: 100,
     wrk2: false,
   },
+  // {
+  //   concurrent: 500,
+  //   wrk2: false,
+  // },
   {
-    concurrent: 300,
-    wrk2: false,
-  },
-  {
-    concurrent: 500,
-    wrk2: false,
-  },
-  {
-    concurrent: 700,
+    concurrent: 1000,
     wrk2: false,
   },
   {
     concurrent: 1000,
     wrk2: true,
   },
-  {
-    concurrent: 3000,
-    wrk2: true,
-  },
-  {
-    concurrent: 5000,
-    wrk2: true,
-  },
-  {
-    concurrent: 7000,
-    wrk2: true,
-  },
+  // {
+  //   concurrent: 5000,
+  //   wrk2: true,
+  // },
+  // {
+  //   concurrent: 10000,
+  //   wrk2: true,
+  // },
 ]
 const key = (c: Case) =>
   c.wrk2 ? `wrk2 rps=${c.concurrent}` : `wrk concurrent=${c.concurrent}`
