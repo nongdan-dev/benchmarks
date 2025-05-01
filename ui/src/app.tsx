@@ -29,7 +29,7 @@ export const Session = ({
 )
 
 export const App = () => (
-  <div className='m-10'>
+  <div className='my-10'>
     {benchmark.sessions.map(s => (
       <Session
         key={s.concurrent}

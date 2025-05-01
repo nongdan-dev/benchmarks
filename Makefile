@@ -5,15 +5,15 @@
 rexpress: rnode;
 
 rnest:
-	export ENV="PLATFORM=nest" \
+	export ENV="FRAMEWORK=nest" \
 	&& make -Bs rnode;
 
 rcluster:
-	export ENV="PLATFORM=express CLUSTER=1" \
+	export ENV="CLUSTER=1" \
 	&& make -Bs rnode;
 
 rultimate:
-	export ENV="PLATFORM=ultimate CLUSTER=1" \
+	export ENV="FRAMEWORK=ultimate CLUSTER=1" \
 	&& make -Bs rnode;
 
 rnode:

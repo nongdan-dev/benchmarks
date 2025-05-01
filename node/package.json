@@ -9,8 +9,8 @@
   "dependencies": {
     "@graphql-tools/schema": "10.0.23",
     "express": "5.1.0",
+    "express-graphql": "0.12.0",
     "graphql": "16.11.0",
-    "graphql-http": "1.22.4",
     "pg": "8.15.6",
     "pg-hstore": "2.3.4",
     "sequelize": "6.37.7",

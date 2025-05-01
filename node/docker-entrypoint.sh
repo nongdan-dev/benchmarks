@@ -3,9 +3,9 @@
 echo "node entrypoint"
 
 npm i
-echo "platform=$PLATFORM cluster=$CLUSTER"
+echo "framework=$FRAMEWORK cluster=$CLUSTER"
 
-if [ $PLATFORM = "ultimate" ]; then
+if [ $FRAMEWORK = "ultimate" ]; then
   if [ -d ./dist ]; then
     echo "node dist already built"
   else

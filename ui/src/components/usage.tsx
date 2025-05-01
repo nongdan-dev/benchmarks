@@ -16,7 +16,7 @@ import { colors, lineColor } from '@/components/colors'
 import { hBytesYAxis, hPercentage } from '@/utils/humanize'
 
 export const Usage = ({ data }: { data: BData[] }) => (
-  <div className='w-[500px] rounded p-5 shadow'>
+  <div className='w-[600px] rounded p-5 shadow'>
     <ResponsiveContainer
       height={400}
       width='100%'
@@ -24,7 +24,7 @@ export const Usage = ({ data }: { data: BData[] }) => (
       <ComposedChart data={data}>
         <CartesianGrid stroke='#f5f5f5' />
 
-        <XAxis dataKey='name' />
+        <XAxis dataKey='framework' />
 
         <YAxis
           orientation='left'
@@ -41,11 +41,7 @@ export const Usage = ({ data }: { data: BData[] }) => (
         />
 
         <Tooltip
-          formatter={(_, name, item) => {
-            const { payload, dataKey } = item
-
-            return [payload[`${dataKey}_humanized`], name]
-          }}
+          formatter={(_, name, item) =>  [item.payload[`${item.dataKey}_humanized`], name]}
         />
 
         <Legend />
@@ -58,7 +54,7 @@ export const Usage = ({ data }: { data: BData[] }) => (
         >
           {data.map((e, i) => (
             <Cell
-              fill={colors[e.name]}
+              fill={colors[e.platform]}
               key={i}
             />
           ))}

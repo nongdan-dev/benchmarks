@@ -55,11 +55,11 @@ export interface BSession {
 }
 
 export interface BData {
-  // eg: node/go/rust...
+  // node/go/rust...
   platform: string
 
   // eg: node can be express/nest/cluster/ultimate...
-  name: string
+  framework: string
 
   duration: number
   total_requests: number

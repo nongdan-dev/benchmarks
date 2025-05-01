@@ -1,7 +1,7 @@
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import type { IResolvers } from '@graphql-tools/utils/typings/Interfaces'
 import type { Express } from 'express'
-import { createHandler } from 'graphql-http/lib/use/express'
+import { graphqlHTTP } from 'express-graphql'
 import type { Model } from 'sequelize'
 import { DataTypes, Sequelize } from 'sequelize'
 
@@ -25,6 +25,7 @@ export const sequelize = new Sequelize({
   define: {
     freezeTableName: true,
     underscored: true,
+    timestamps: false,
   },
 })
 
@@ -70,7 +71,7 @@ export const startExpress = (express: any, resolvers: IResolvers) => {
     typeDefs: graphqlTypeDefs,
     resolvers,
   })
-  app.use('/graphql', createHandler({ schema }))
+  app.use('/graphql', graphqlHTTP({ schema }))
   app.listen(httpPort, err => {
     if (err) {
       console.error(`express listen error: ${err}`)

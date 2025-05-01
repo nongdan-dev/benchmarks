@@ -16,7 +16,7 @@ services:
       - .env
     environment:
       - NODE_ENVIRONMENT=production
-      - PLATFORM=${PLATFORM:-express}
+      - FRAMEWORK=${FRAMEWORK:-express}
       - CLUSTER=${CLUSTER:-}
 
   benchmarks-go:

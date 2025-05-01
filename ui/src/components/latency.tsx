@@ -16,7 +16,7 @@ import { colors, lineColor } from '@/components/colors'
 import { hNanosecond, hNumber } from '@/utils/humanize'
 
 export const Latency = ({ data }: { data: BData[] }) => (
-  <div className='w-[500px] rounded p-5 shadow'>
+  <div className='w-[600px] rounded p-5 shadow'>
     <ResponsiveContainer
       height={400}
       width='100%'
@@ -52,7 +52,7 @@ export const Latency = ({ data }: { data: BData[] }) => (
 
         <CartesianGrid stroke='#f5f5f5' />
 
-        <XAxis dataKey='name' />
+        <XAxis dataKey='framework' />
 
         <YAxis
           orientation='left'
@@ -69,11 +69,7 @@ export const Latency = ({ data }: { data: BData[] }) => (
         />
 
         <Tooltip
-          formatter={(_, name, item) => {
-            const { payload, dataKey } = item
-
-            return [payload[`${dataKey}_humanized`], name]
-          }}
+          formatter={(_, name, item) =>  [item.payload[`${item.dataKey}_humanized`], name]}
         />
 
         <Legend />
@@ -101,7 +97,7 @@ export const Latency = ({ data }: { data: BData[] }) => (
         >
           {data.map((e, i) => (
             <Cell
-              fill={`url(#striped-${e.name})`}
+              fill={`url(#striped-${e.platform})`}
               key={i}
             />
           ))}

@@ -1,4 +1,5 @@
 import bytes from 'bytes'
+import { uniq } from 'lodash'
 import { exec as execWithCallback } from 'node:child_process'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -13,7 +14,33 @@ import type {
 
 const exec = promisify(execWithCallback)
 const duration = 60
-const platforms = ['rust', 'go', 'node']
+const frameworks = [
+  {
+    platform: 'node',
+    framework: 'express',
+  },
+  // {
+  //   platform: 'node',
+  //   framework: 'nest',
+  // },
+  {
+    platform: 'node',
+    framework: 'cluster',
+  },
+  {
+    platform: 'node',
+    framework: 'ultimate',
+  },
+  {
+    platform: 'go',
+  },
+  {
+    platform: 'rust',
+  },
+].map(f => ({
+  ...f,
+  framework: f.framework || f.platform,
+}))
 
 type Case = Pick<BSession, 'concurrent' | 'wrk2'>
 const cases: Case[] = [
@@ -32,7 +59,7 @@ const key = (c: Case) =>
 const main = async () => {
   console.log('kill all services except wrk...')
   await Promise.all([
-    ...platforms.map(async p => exec(`make k${p}`)),
+    ...uniq(frameworks.map(f => f.platform)).map(async p => exec(`make k${p}`)),
     exec('make rwrk'),
   ])
 
@@ -58,9 +85,9 @@ const main = async () => {
       .filter(c => c.wrk2 === wrk2)
       .map(c => c.concurrent)
 
-    for (const platform of platforms) {
-      console.log(`--- ${platform} start, warm up and check wrk...`)
-      await exec(`make r${platform}`)
+    for (const { platform, framework } of frameworks) {
+      console.log(`--- ${framework} start, warm up and check wrk...`)
+      await exec(`make r${framework}`)
       await exec(
         `docker exec benchmarks-wrk timeout 30s sh -c 'until nc -z benchmarks-${platform} 30000; do sleep 1; done'`,
       )
@@ -68,7 +95,7 @@ const main = async () => {
 
       for (const concurrent of concurrents) {
         const k = key({ wrk2, concurrent })
-        console.log(`${platform} ${k}...`)
+        console.log(`${framework} ${k}...`)
         const o: WrkOptions = {
           platform,
           concurrent,
@@ -80,13 +107,13 @@ const main = async () => {
         const [wrk_stats, usage_raw] = await Promise.all([wrk(o), usage(o)])
         sessionMapData[k].push({
           platform,
-          name: platform,
+          framework,
           ...wrk_stats,
           usage_raw,
         })
       }
 
-      console.log(`${platform} kill, prune and cool down...`)
+      console.log(`${framework} kill, prune and cool down...`)
       await exec(`make k${platform}`)
       await new Promise(r => setTimeout(r, 5000))
     }
