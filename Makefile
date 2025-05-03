@@ -4,16 +4,12 @@
 
 rexpress: rnode;
 
-rnest:
-	export ENV="FRAMEWORK=nest" \
-	&& make -Bs rnode;
-
 rcluster:
 	export ENV="CLUSTER=1" \
 	&& make -Bs rnode;
 
-rultimate:
-	export ENV="FRAMEWORK=ultimate CLUSTER=1" \
+rfastify:
+	export ENV="FRAMEWORK=fastify CLUSTER=1" \
 	&& make -Bs rnode;
 
 rnode:

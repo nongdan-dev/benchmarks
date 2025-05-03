@@ -94,9 +94,6 @@ next-env.d.ts
 yarn.lock
 pnpm-lock.yaml
 
-# rust
-**/.rust-cache
+# go, rust
+**/.*-cache
 **/target/
-
-# go
-**/.go-cache

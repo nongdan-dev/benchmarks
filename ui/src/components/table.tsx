@@ -1,61 +1,86 @@
 import React from 'react'
 
 import type { BData } from '@/assets/benchmark'
+import { cx } from '@/utils/class-names'
 import { hNanosecond } from '@/utils/humanize'
 
 interface TableViewProps {
   data: BData[]
 }
 
-export const Table: React.FC<TableViewProps> = ({ data }) => (
-  <div className='overflow-x-auto'>
-    <table className='max-w-full table-auto rounded-lg bg-white shadow-lg'>
-      <thead>
-        <tr className='border bg-gray-800 text-white'>
-          <th className='border border-gray-800 px-4 py-2' />
-          <th className='border border-gray-800 px-4 py-2 text-right'>avg</th>
-          <th className='border border-gray-800 px-4 py-2 text-right'>p50</th>
-          <th className='border border-gray-800 px-4 py-2 text-right'>p90</th>
-          <th className='border border-gray-800 px-4 py-2 text-right'>p99</th>
-          <th className='border border-gray-800 px-4 py-2 text-right'>tm99</th>
-          <th className='border border-gray-800 px-4 py-2 text-right'>max</th>
-          <th className='border border-gray-800 px-4 py-2 text-right'>stdev</th>
-        </tr>
-      </thead>
-
-      <tbody className=''>
-        {data.map(row => (
-          <tr
-            className='hover:bg-gray-50'
-            key={row.framework}
-          >
-            <td className='border border-gray-800 px-4 py-2 font-medium text-gray-900'>
-              {row.framework}
-            </td>
-            <td className='border border-gray-800 px-4 py-2 text-right'>
-              {hNanosecond(row.latency_avg)}
-            </td>
-            <td className='border border-gray-800 px-4 py-2 text-right'>
-              {hNanosecond(row.latency_p50)}
-            </td>
-            <td className='border border-gray-800 px-4 py-2 text-right'>
-              {hNanosecond(row.latency_p90)}
-            </td>
-            <td className='border border-gray-800 px-4 py-2 text-right'>
-              {hNanosecond(row.latency_p99)}
-            </td>
-            <td className='border border-gray-800 px-4 py-2 text-right'>
-              {hNanosecond(row.latency_tm99)}
-            </td>
-            <td className='border border-gray-800 px-4 py-2 text-right'>
-              {hNanosecond(row.latency_max)}
-            </td>
-            <td className='border border-gray-800 px-4 py-2 text-right'>
-              {hNanosecond(row.latency_stdev)}
-            </td>
+export const Table: React.FC<TableViewProps> = ({ data }) => {
+  const rows = [
+    'avg',
+    'p50',
+    'p90',
+    'p99',
+    'tm99',
+    'max',
+    'min',
+    'stdev',
+  ] as const
+  const min = rows.reduce<{ [k: string]: number }>((m, r) => {
+    m[r] = Math.min(...data.map(d => d[`latency_${r}`]))
+    return m
+  }, {})
+  const min2 = rows.reduce<{ [k: string]: number }>((m, r) => {
+    m[r] = Math.min(
+      ...data.map(d => d[`latency_${r}`]).filter(v => v !== min[r]),
+    )
+    return m
+  }, {})
+  const max = rows.reduce<{ [k: string]: number }>((m, r) => {
+    m[r] = Math.max(...data.map(d => d[`latency_${r}`]))
+    return m
+  }, {})
+  return (
+    <div className='overflow-x-auto'>
+      <table className='max-w-full table-auto rounded-lg bg-white shadow-lg'>
+        <thead>
+          <tr className='border bg-gray-800 text-white'>
+            <th className='border border-gray-800 px-4 py-2' />
+            {rows.map(r => (
+              <th
+                key={r}
+                className='border border-gray-800 px-4 py-2 text-right'
+              >
+                {r}
+              </th>
+            ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)
+        </thead>
+
+        <tbody className=''>
+          {data.map(d => (
+            <tr
+              key={d.framework}
+              className='hover:bg-gray-50'
+            >
+              <td className='border border-gray-800 px-4 py-2 font-bold'>
+                {d.framework}
+              </td>
+              {rows.map(r => {
+                const v = d[`latency_${r}`]
+                return (
+                  <td
+                    key={r}
+                    className={cx(
+                      'border border-gray-800 px-4 py-2 text-right',
+                      {
+                        'text-green-600': v === min[r],
+                        'text-blue-600': v === min2[r],
+                        'text-red-600': v === max[r],
+                      },
+                    )}
+                  >
+                    {hNanosecond(v)}
+                  </td>
+                )
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}

@@ -19,17 +19,13 @@ const frameworks = [
     platform: 'node',
     framework: 'express',
   },
-  // {
-  //   platform: 'node',
-  //   framework: 'nest',
-  // },
   {
     platform: 'node',
     framework: 'cluster',
   },
   {
     platform: 'node',
-    framework: 'ultimate',
+    framework: 'fastify',
   },
   {
     platform: 'go',
@@ -57,15 +53,15 @@ const cases: Case[] = [
     wrk2: false,
   },
   {
-    concurrent: 1000,
-    wrk2: true,
-  },
-  {
     concurrent: 5000,
     wrk2: true,
   },
   {
     concurrent: 10000,
+    wrk2: true,
+  },
+  {
+    concurrent: 20000,
     wrk2: true,
   },
 ]
@@ -217,7 +213,7 @@ const _wrk = async (o: WrkOptions) => {
   const cmd = o.wrk2 ? 'wrk2' : 'wrk'
   const t = `-t${o.threads}`
   const d = `-d${o.duration}`
-  const c = `-c${o.wrk2 ? 100 : o.concurrent}`
+  const c = `-c${o.wrk2 ? o.threads * 100 : o.concurrent}`
   const r = o.wrk2 ? `-R${o.concurrent}` : ''
   const s = `-s ./scripts/${o.script}.lua`
   const u = `http://benchmarks-${o.platform}:30000`

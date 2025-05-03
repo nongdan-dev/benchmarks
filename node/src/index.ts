@@ -1,4 +1,4 @@
-// express/nest/ultimate
+// express/fastify
 const { start } = require(`./${process.env.FRAMEWORK}`)
 
 if (process.env.CLUSTER) {
