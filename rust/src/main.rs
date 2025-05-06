@@ -5,9 +5,10 @@ use anyhow::Context as _;
 use async_graphql::{Context, EmptyMutation, EmptySubscription, Object, Result, Schema};
 use async_graphql_axum::GraphQL;
 use axum::{Router, routing::post_service, serve};
-use sea_orm::{ConnectOptions, Database, DatabaseConnection, entity::prelude::*};
+use sea_orm::{entity::prelude::*, ConnectOptions, Database, DatabaseConnection};
 use std::{env, error::Error};
 use tokio::net::TcpListener;
+
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {

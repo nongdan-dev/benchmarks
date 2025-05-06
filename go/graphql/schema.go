@@ -18,6 +18,18 @@ var userType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
+// go/
+// |	|-controllers/
+// |	|	|-user_controller.go
+// |	|-graphql/
+// |	|	|-schema.go
+// |	|-models/
+// |	|	|-post.go
+// |	|	|-user.go
+// |	|-routes/
+// |	|	|-routes.go
+// |-main.go
+
 var RootQuery = graphql.NewObject(graphql.ObjectConfig{
 	Name: "RootQuery",
 	Fields: graphql.Fields{

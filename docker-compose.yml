@@ -17,8 +17,8 @@ services:
     environment:
       - NODE_ENVIRONMENT=production
       - FRAMEWORK=${FRAMEWORK:-express}
-      - CLUSTER=${CLUSTER:-}
-      - JM=${JM:-}
+      - CLUSTER=${CLUSTER:-0}
+      - JM=${JM:-0}
 
   benchmarks-go:
     container_name: benchmarks-go

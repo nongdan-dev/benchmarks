@@ -2,7 +2,8 @@ import type { Model } from 'sequelize'
 import { DataTypes, Sequelize } from 'sequelize'
 
 // environment variables will be passed directly in docker-compose.yml
-const host = process.env.POSTGRES_HOST
+
+const host = 'localhost'
 const port = Number(process.env.POSTGRES_PORT)
 const username = process.env.POSTGRES_USER
 const password = process.env.POSTGRES_PASSWORD
@@ -25,12 +26,17 @@ export const sequelize = new Sequelize({
 
 // TODO: add relationship to enable the n+1 query
 
-type UserAttrs = {
+export type UserAttrs = {
   id: number
   name: string
   email: string
+  posts?: []
 }
-export const User = sequelize.define<Model<UserAttrs, UserAttrs>>('user', {
+
+type UserCreationAttrs = Omit<UserAttrs, 'id'>
+
+
+export const User = sequelize.define<Model<UserAttrs, UserCreationAttrs>>('user', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -45,4 +51,49 @@ export const User = sequelize.define<Model<UserAttrs, UserAttrs>>('user', {
     allowNull: false,
     unique: true,
   },
+})
+
+export type PostAttrs = {
+  id: number
+  userId: number
+  title: string
+  description: string
+  content: string
+  user?: UserAttrs
+}
+
+type PostCreationAttrs = Omit<PostAttrs, 'id'>
+
+export const Post = sequelize.define<Model<PostAttrs, PostCreationAttrs>>('post', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: User,
+      key: 'id',
+    },
+  },
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  content: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  description: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+})
+
+
+Post.belongsTo(User, {
+  foreignKey: 'userId',
+  // as: 'user',
 })

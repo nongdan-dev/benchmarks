@@ -1,0 +1,33 @@
+### Root Types
+type Query {
+  posts: [Post!]!
+  users: [User!]!
+}
+
+type Mutation {
+  createPost(input: CreatePostInput!): Post!
+}
+
+### Input Types
+input CreatePostInput {
+  title: String!
+  description: String!
+  content: String!
+  userId: ID!
+}
+
+### Object Types
+type Post {
+  id: Int!
+  title: String!
+  description: String!
+  content: String!
+  user: User!
+}
+
+type User {
+  id: Int!
+  name: String!
+  email: String!
+  posts: [Post!]!
+}
