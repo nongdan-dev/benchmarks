@@ -33,16 +33,17 @@ async fn main() -> Result<(), Box<dyn Error>> {
 // ----------------------------------------------------------------------------
 // db connection
 pub async fn db_conn() -> Result<DatabaseConnection, Box<dyn Error>> {
-    fn e(k: &str) -> Result<String, Box<dyn Error>> {
-        let v = env::var(k).context("missing env ".to_owned() + k)?;
-        Ok(v)
-    }
-    let h = e("POSTGRES_HOST")?;
-    let p = e("POSTGRES_PORT")?;
-    let u = e("POSTGRES_USER")?;
-    let pw = e("POSTGRES_PASSWORD")?;
-    let db = e("POSTGRES_DB")?;
-    let url = format!("postgres://{}:{}@{}:{}/{}", u, pw, h, p, db);
+    // fn e(k: &str) -> Result<String, Box<dyn Error>> {
+    //     let v = env::var(k).context("missing env ".to_owned() + k)?;
+    //     Ok(v)
+    // }
+    // let h = e("POSTGRES_HOST")?;
+    // let p = e("POSTGRES_PORT")?;
+    // let u = e("POSTGRES_USER")?;
+    // let pw = e("POSTGRES_PASSWORD")?;
+    // let db = e("POSTGRES_DB")?;
+    // let url = format!("postgres://{}:{}@{}:{}/{}", u, pw, h, p, db);
+    let url = format!("postgres://{}:{}@{}:{}/{}", "postgres", "100845","localhost", "5432", "demoRustdb");
     let conn = Database::connect(ConnectOptions::new(url)).await?;
     Ok(conn)
 }
