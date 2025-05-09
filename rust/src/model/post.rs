@@ -13,8 +13,8 @@ pub struct Model {
     pub user_id: i32,
 }
 
-// pub type Post = Model;
-// pub type PostEntity = Entity;
+pub type Post = Model;
+pub type PostEntity = Entity;
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
