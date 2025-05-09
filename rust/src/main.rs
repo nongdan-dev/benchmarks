@@ -1,16 +1,16 @@
 mod model;
 use model::*;
 
-use anyhow::Context as _;
-use async_graphql::{Context, EmptyMutation, EmptySubscription, Object, Result, Schema};
+use anyhow::{Context as _, Result, anyhow};
+use async_graphql::{Context, EmptyMutation, EmptySubscription, Object, Schema};
 use async_graphql_axum::GraphQL;
 use axum::{Router, routing::post_service, serve};
 use sea_orm::{ConnectOptions, Database, DatabaseConnection, entity::prelude::*};
-use std::{env, error::Error};
+use std::env;
 use tokio::net::TcpListener;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
+async fn main() -> Result<()> {
     let pool: DatabaseConnection = db_conn().await?;
     let schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
         .data(pool.clone())
@@ -31,9 +31,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
 // ----------------------------------------------------------------------------
 // db connection
-pub async fn db_conn() -> Result<DatabaseConnection, Box<dyn Error>> {
-    fn e(k: &str) -> Result<String, Box<dyn Error>> {
-        let v = env::var(k).context("missing env ".to_owned() + k)?;
+pub async fn db_conn() -> Result<DatabaseConnection> {
+    fn e(k: &str) -> Result<String> {
+        let v = env::var(k).context(format!("missing env {}", k))?;
         Ok(v)
     }
     let h = e("POSTGRES_HOST")?;
@@ -55,7 +55,9 @@ pub struct QueryRoot;
 #[Object]
 impl QueryRoot {
     async fn users(&self, ctx: &Context<'_>) -> Result<Vec<User>> {
-        let db = ctx.data::<DatabaseConnection>()?;
+        let db = ctx
+            .data::<DatabaseConnection>()
+            .map_err(|e| anyhow!(e.message))?;
         let data = UserEntity::find().all(db).await?;
         Ok(data)
     }

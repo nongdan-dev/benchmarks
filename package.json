@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node -r ts-node/register/transpile-only index.ts",
+    "start": "node -r ts-node/register/transpile-only .",
     "lint": "eslint --fix . && prettier --log-level=error --write ."
   },
   "dependencies": {
