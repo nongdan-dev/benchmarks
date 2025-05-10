@@ -10,7 +10,7 @@ use sea_orm::{DatabaseConnection, EntityTrait, ColumnTrait, QueryFilter};
 use crate::model::post::{Post, PostEntity};
 use crate::model::user::{User, UserEntity};
 
-/// Load từng Post theo ID
+
 pub struct PostLoader(pub DatabaseConnection);
 
 impl Loader<i32> for PostLoader {
@@ -32,7 +32,7 @@ impl Loader<i32> for PostLoader {
     }
 }
 
-/// Load từng User theo ID
+
 pub struct UserLoader(pub DatabaseConnection);
 
 impl Loader<i32> for UserLoader {
@@ -63,7 +63,8 @@ impl Loader<i32> for UserLoader {
     }
 }
 
-/// Load toàn bộ Post theo `user_id` (1-n)
+
+
 pub struct PostByUserIdLoader(pub DatabaseConnection);
 
 impl Loader<i32> for PostByUserIdLoader {
